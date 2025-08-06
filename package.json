@@ -1,0 +1,42 @@
+{
+  "name": "kizazi-africa",
+  "private": true,
+  "version": "1.0.0",
+  "description": "KIZAZI - Social Media Management Platform for Africa",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "server": "cd server && npm start",
+    "server:dev": "cd server && npm run dev",
+    "start:all": "concurrently \"npm run server:dev\" \"npm run dev\"",
+    "install:all": "npm install && cd server && npm install",
+    "setup": "npm run install:all && echo Setup complete! Run 'npm run start:all' to start both frontend and backend",
+    "build:production": "npm run build && cd server && npm install --production",
+    "start:production": "cd server && npm start"
+  },
+  "dependencies": {
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.536.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.30.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.3",
+    "vite": "^7.0.4"
+  }
+}

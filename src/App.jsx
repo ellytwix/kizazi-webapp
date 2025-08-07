@@ -31,7 +31,9 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { RegionProvider, useRegion } from './contexts/RegionContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import RegionSelection from './components/RegionSelection';
 import apiService from './services/api';
 
 // Create AuthContext for use in components
@@ -668,8 +670,17 @@ const ModeSelection = ({ onModeSelect }) => {
 };
 
 // --- MAIN APP COMPONENT ---
-// This component provides the Auth and Language contexts and renders the main layout.
+// This component provides the Auth, Language and Region contexts and renders the main layout.
 const App = () => {
+  return (
+    <RegionProvider>
+      <AppRouter />
+    </RegionProvider>
+  );
+};
+
+const AppRouter = () => {
+  const { isRegionSelected } = useRegion();
   const [appMode, setAppMode] = useState('demo'); // Start directly in demo mode to fix styling
   const [showModeSelection, setShowModeSelection] = useState(false);
 
@@ -681,6 +692,11 @@ const App = () => {
   const handleBackToHome = () => {
     setShowModeSelection(true);
   };
+
+  // Show region selection first if no region is selected
+  if (!isRegionSelected) {
+    return <RegionSelection />;
+  }
 
   // Show mode selection if requested
   if (showModeSelection) {

@@ -1,5 +1,5 @@
 // API service for KIZAZI frontend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 class ApiService {
   constructor() {
@@ -38,16 +38,52 @@ class ApiService {
     };
 
     try {
+      console.log(`Making request to: ${url}`);
       const response = await fetch(url, config);
-      const data = await response.json();
-
+      
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        let errorMessage;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || `HTTP error! status: ${response.status}`;
+        } catch {
+          errorMessage = `HTTP error! status: ${response.status} - ${response.statusText}`;
+        }
+        
+        // Enhanced error messages based on status code
+        switch (response.status) {
+          case 400:
+            errorMessage = `Bad Request: ${errorMessage}`;
+            break;
+          case 401:
+            errorMessage = `Authentication failed: ${errorMessage}`;
+            break;
+          case 403:
+            errorMessage = `Access denied: ${errorMessage}`;
+            break;
+          case 404:
+            errorMessage = `Not found: ${errorMessage}`;
+            break;
+          case 500:
+            errorMessage = `Server error: ${errorMessage}`;
+            break;
+          default:
+            errorMessage = `Request failed: ${errorMessage}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
+      const data = await response.json();
       return data;
     } catch (error) {
       console.error('API request failed:', error);
+      
+      // Handle network errors
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+      }
+      
       throw error;
     }
   }

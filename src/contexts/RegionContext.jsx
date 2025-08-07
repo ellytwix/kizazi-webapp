@@ -10,114 +10,36 @@ export const useRegion = () => {
   return context;
 };
 
-// Region configurations
-const REGIONS = {
-  tanzania: {
-    id: 'tanzania',
-    name: 'Tanzania',
-    flag: '🇹🇿',
-    currency: {
-      code: 'TSH',
-      symbol: 'TSh',
-      name: 'Tanzanian Shilling'
-    },
-    timezone: 'Africa/Dar_es_Salaam',
-    locale: 'sw-TZ', // Swahili - Tanzania
-    socialPlatforms: {
-      facebook: true,
-      instagram: true,
-      twitter: true,
-      tiktok: true,
-      whatsapp: true
-    }
-  },
-  kenya: {
-    id: 'kenya',
-    name: 'Kenya',
-    flag: '🇰🇪',
-    currency: {
-      code: 'KSH',
-      symbol: 'KSh',
-      name: 'Kenyan Shilling'
-    },
-    timezone: 'Africa/Nairobi',
-    locale: 'sw-KE', // Swahili - Kenya
-    socialPlatforms: {
-      facebook: true,
-      instagram: true,
-      twitter: true,
-      tiktok: true,
-      whatsapp: true
-    }
-  }
+const regions = {
+  Tanzania: { currency: 'TSh', code: 'TZ' },
+  Kenya: { currency: 'KSh', code: 'KE' },
 };
 
 export const RegionProvider = ({ children }) => {
-  const [selectedRegion, setSelectedRegion] = useState(null);
+  const [region, setRegion] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load saved region from localStorage on app start
   useEffect(() => {
-    const savedRegion = localStorage.getItem('selectedRegion');
-    if (savedRegion && REGIONS[savedRegion]) {
-      setSelectedRegion(REGIONS[savedRegion]);
+    const savedRegion = localStorage.getItem('app_region');
+    if (savedRegion && regions[savedRegion]) {
+      setRegion({ name: savedRegion, ...regions[savedRegion] });
     }
     setLoading(false);
   }, []);
 
-  const selectRegion = (regionId) => {
-    if (REGIONS[regionId]) {
-      const region = REGIONS[regionId];
-      setSelectedRegion(region);
-      localStorage.setItem('selectedRegion', regionId);
+  const selectRegion = (regionName) => {
+    if (regions[regionName]) {
+      localStorage.setItem('app_region', regionName);
+      setRegion({ name: regionName, ...regions[regionName] });
     }
   };
 
-  const formatCurrency = (amount, showSymbol = true) => {
-    if (!selectedRegion) return amount;
-    
-    const formatted = new Intl.NumberFormat(selectedRegion.locale, {
-      style: 'decimal',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(amount);
-
-    return showSymbol ? `${selectedRegion.currency.symbol} ${formatted}` : formatted;
-  };
-
-  const getCurrentDateTime = () => {
-    if (!selectedRegion) return new Date();
-    
-    return new Intl.DateTimeFormat(selectedRegion.locale, {
-      timeZone: selectedRegion.timezone,
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(new Date());
-  };
-
-  const getLocalTime = () => {
-    if (!selectedRegion) return new Date().toLocaleTimeString();
-    
-    return new Intl.DateTimeFormat(selectedRegion.locale, {
-      timeZone: selectedRegion.timezone,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }).format(new Date());
-  };
-
   const value = {
-    selectedRegion,
-    selectRegion,
-    regions: REGIONS,
+    region,
+    regions,
     loading,
-    formatCurrency,
-    getCurrentDateTime,
-    getLocalTime,
-    isRegionSelected: !!selectedRegion
+    selectRegion,
+    isRegionSelected: !!region,
   };
 
   return (
@@ -126,5 +48,3 @@ export const RegionProvider = ({ children }) => {
     </RegionContext.Provider>
   );
 };
-
-export default RegionContext;

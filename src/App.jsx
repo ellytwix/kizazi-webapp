@@ -34,694 +34,40 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { RegionProvider, useRegion } from './contexts/RegionContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import RegionSelection from './components/RegionSelection';
+import LoginModal from './components/Auth/LoginModal';
 import apiService from './services/api';
-
-// Create AuthContext for use in components
-const AuthContext = React.createContext();
-
-// --- TRANSLATION & LANGUAGE CONTEXT ---
-// This context manages the application's language state and provides a translation function 't'.
-// It's a clean way to handle internationalization (i18n).
-
-const translations = {
-  en: {
-    appName: 'KIZAZI',
-    menu: {
-      dashboard: 'Dashboard',
-      scheduler: 'Post Scheduler',
-      analytics: 'Analytics',
-      aiContent: 'AI Content',
-      pricing: 'Pricing',
-      support: 'Support'
-    },
-    language: 'Language',
-    dashboard: {
-      title: 'Dashboard',
-      welcome: 'Welcome back to KIZAZI!',
-      summary: 'Here is a quick summary of your social media performance.',
-      postsScheduled: 'Scheduled Posts',
-      engagements: 'Engagements',
-      newFollowers: 'New Followers',
-      growthRate: 'Growth Rate',
-      upcomingPosts: 'Upcoming Posts'
-    },
-    scheduler: {
-      title: 'Post Scheduler & Calendar',
-      managePosts: 'Manage and schedule your social media posts for different platforms.',
-      createPost: 'Create a New Post',
-      editPost: 'Edit Post',
-      platform: 'Platform',
-      content: 'Post Content',
-      date: 'Schedule Date',
-      time: 'Schedule Time',
-      schedule: 'Schedule Post',
-      update: 'Update Post',
-      noPosts: 'No posts scheduled for this day.',
-      postScheduled: 'Post scheduled successfully!',
-      postUpdated: 'Post updated successfully!',
-      deletePost: 'Delete Post',
-      deleteConfirmTitle: 'Confirm Deletion',
-      deleteConfirm: 'Are you sure you want to delete this post? This action cannot be undone.',
-      deleteSuccess: 'Post deleted successfully!',
-      placeholderContent: 'Write your post content here...',
-      confirm: 'Confirm',
-      cancel: 'Cancel'
-    },
-    aiContent: {
-      title: 'AI Content Generator',
-      caption: 'Generate Captions & Hashtags',
-      promptLabel: 'Describe your post:',
-      promptPlaceholder: 'e.g., A photo of a beautiful sunset over the savanna.',
-      generate: 'Generate Content',
-      generatedTitle: 'Generated Content',
-      copySuccess: 'Copied to clipboard!',
-      loading: 'Generating your content...',
-      error: 'Failed to generate content. Please try again.'
-    },
-    analytics: {
-      title: 'Analytics & Reports',
-      placeholder: 'This is where you would see your cross-platform performance reports. We are working on integrating with Facebook, Instagram, and X APIs to provide detailed insights.'
-    },
-    pricing: {
-      title: 'Pricing for Africa',
-      intro: 'Simple and affordable pricing plans to help you grow your business.',
-      plan1: {
-        name: 'Starter',
-        price: 'Ksh 1,500',
-        features: ['Up to 3 social media accounts', '15 scheduled posts/month', 'Basic analytics']
-      },
-      plan2: {
-        name: 'Pro',
-        price: 'Ksh 5,000',
-        features: ['Up to 10 social media accounts', 'Unlimited scheduled posts', 'Advanced analytics', 'AI Content Generator']
-      },
-      plan3: {
-        name: 'Enterprise',
-        price: 'Contact us',
-        features: ['Unlimited accounts', 'Custom solutions', 'Dedicated support', 'Payment Integration']
-      },
-      buyButton: 'Choose Plan',
-      paymentSuccess: 'Thank you for your purchase! Your simulated payment was successful. We will contact you shortly.'
-    },
-    support: {
-      title: 'Support & Resources',
-      whatsapp: 'WhatsApp Support',
-      whatsappDescription: 'Get real-time support from our team on WhatsApp.',
-      educational: 'Educational Resources',
-      educationalDescription: 'Learn how to maximize your social media presence with our guides.',
-      resource1: 'Getting Started with KIZAZI',
-      resource2: 'Mastering the Post Scheduler',
-      resource3: 'Guide to AI-Generated Content',
-      link: 'View Resource',
-      chat: 'Chat with us'
-    }
-  },
-  sw: {
-    appName: 'KIZAZI',
-    menu: {
-      dashboard: 'Dashibodi',
-      scheduler: 'Kipanga-Chapisho',
-      analytics: 'Uchambuzi',
-      aiContent: 'Maudhui ya AI',
-      pricing: 'Bei',
-      support: 'Usaidizi'
-    },
-    language: 'Lugha',
-    dashboard: {
-      title: 'Dashibodi',
-      welcome: 'Karibu tena kwenye KIZAZI!',
-      summary: 'Huu ni muhtasari wa haraka wa utendaji wako kwenye mitandao ya kijamii.',
-      postsScheduled: 'Machapisho Yaliyopangwa',
-      engagements: 'Mwingiliano',
-      newFollowers: 'Wafuasi Wapya',
-      growthRate: 'Kiwango cha Ukuaji',
-      upcomingPosts: 'Machapisho Yanayokuja'
-    },
-    scheduler: {
-      title: 'Kipanga-Chapisho & Kalenda',
-      managePosts: 'Dhibiti na panga machapisho yako ya mitandao ya kijamii.',
-      createPost: 'Andika Chapisho Jipya',
-      editPost: 'Hariri Chapisho',
-      platform: 'Jukwaa',
-      content: 'Maudhui ya Chapisho',
-      date: 'Tarehe ya Kupanga',
-      time: 'Muda wa Kupanga',
-      schedule: 'Panga Chapisho',
-      update: 'Sasisha Chapisho',
-      noPosts: 'Hakuna machapisho yaliyopangwa kwa siku hii.',
-      postScheduled: 'Chapisho limepangwa kwa mafanikio!',
-      postUpdated: 'Chapisho limesasishwa kwa mafanikio!',
-      deletePost: 'Futa Chapisho',
-      deleteConfirmTitle: 'Thibitisha Kufuta',
-      deleteConfirm: 'Una uhakika unataka kufuta chapisho hili? Kitendo hiki hakiwezi kutenduliwa.',
-      deleteSuccess: 'Chapisho limefutwa kwa mafanikio!',
-      placeholderContent: 'Andika maudhui ya chapisho lako hapa...',
-      confirm: 'Thibitisha',
-      cancel: 'Ghairi'
-    },
-    aiContent: {
-      title: 'Maudhui ya AI',
-      caption: 'Tengeneza Maelezo & Hashtag',
-      promptLabel: 'Eleza chapisho lako:',
-      promptPlaceholder: 'mfano, Picha ya machweo mazuri juu ya savanna.',
-      generate: 'Tengeneza Maudhui',
-      generatedTitle: 'Maudhui Yaliyotengenezwa',
-      copySuccess: 'Imenakiliwa!',
-      loading: 'Tunatengeneza maudhui yako...',
-      error: 'Imeshindwa kutengeneza maudhui. Tafadhali jaribu tena.'
-    },
-    analytics: {
-      title: 'Uchambuzi na Ripoti',
-      placeholder: 'Hapa ndipo utaona ripoti za utendaji wako wa majukwaa mbalimbali. Tunafanyia kazi ujumuishaji wa API za Facebook, Instagram na X ili kutoa maarifa ya kina.'
-    },
-    pricing: {
-      title: 'Bei kwa Afrika',
-      intro: 'Mipango rahisi na ya bei nafuu kukusaidia kukuza biashara yako.',
-      plan1: {
-        name: 'Mwanzo',
-        price: 'Ksh 1,500',
-        features: ['Hadi akaunti 3 za mitandao ya kijamii', 'machapisho 15 yaliyopangwa/mwezi', 'Uchambuzi wa kawaida']
-      },
-      plan2: {
-        name: 'Pro',
-        price: 'Ksh 5,000',
-        features: ['Hadi akaunti 10 za mitandao ya kijamii', 'Machapisho yasiyo na kikomo', 'Uchambuzi wa hali ya juu', 'Jenereta ya Maudhui ya AI']
-      },
-      plan3: {
-        name: 'Biashara Kubwa',
-        price: 'Wasiliana nasi',
-        features: ['Akaunti zisizo na kikomo', 'Suluhisho maalum', 'Usaidizi maalum', 'Ujumuishaji wa Malipo']
-      },
-      buyButton: 'Chagua Mpango',
-      paymentSuccess: 'Asante kwa ununuzi wako! Malipo yako ya kuiga yamefaulu. Tutakutana na wewe hivi karibuni.'
-    },
-    support: {
-      title: 'Usaidizi na Rasilimali',
-      whatsapp: 'Usaidizi wa WhatsApp',
-      whatsappDescription: 'Pata usaidizi wa moja kwa moja kutoka kwa timu yetu kwenye WhatsApp.',
-      educational: 'Rasilimali za Elimu',
-      educationalDescription: 'Jifunze jinsi ya kuongeza uwepo wako kwenye mitandao ya kijamii kwa kutumia miongozo yetu.',
-      resource1: 'Kuanza na KIZAZI',
-      resource2: 'Kutawala Kipanga-Chapisho',
-      resource3: 'Mwongozo wa Maudhui Yanayotengenezwa na AI',
-      link: 'Tazama Rasilimali',
-      chat: 'Wasiliana nasi'
-    }
-  },
-  fr: {
-    appName: 'KIZAZI',
-    menu: {
-      dashboard: 'Tableau de bord',
-      scheduler: 'Planificateur de publications',
-      analytics: 'Analyses',
-      aiContent: 'Contenu IA',
-      pricing: 'Tarifs',
-      support: 'Support'
-    },
-    language: 'Langue',
-    dashboard: {
-      title: 'Tableau de bord',
-      welcome: 'Bienvenue sur KIZAZI!',
-      summary: 'Voici un résumé rapide de vos performances sur les réseaux sociaux.',
-      postsScheduled: 'Publications planifiées',
-      engagements: 'Engagements',
-      newFollowers: 'Nouveaux abonnés',
-      growthRate: 'Taux de croissance',
-      upcomingPosts: 'Publications à venir'
-    },
-    scheduler: {
-      title: 'Planificateur de publications et calendrier',
-      managePosts: 'Gérez et planifiez vos publications pour les différents réseaux sociaux.',
-      createPost: 'Créer une nouvelle publication',
-      editPost: 'Modifier la publication',
-      platform: 'Plateforme',
-      content: 'Contenu de la publication',
-      date: 'Date de planification',
-      time: 'Heure de planification',
-      schedule: 'Planifier',
-      update: 'Mettre à jour',
-      noPosts: 'Aucune publication prévue pour ce jour.',
-      postScheduled: 'Publication planifiée avec succès!',
-      postUpdated: 'Publication mise à jour avec succès!',
-      deletePost: 'Supprimer la publication',
-      deleteConfirmTitle: 'Confirmer la suppression',
-      deleteConfirm: 'Êtes-vous sûr de vouloir supprimer cette publication? Cette action est irréversible.',
-      deleteSuccess: 'Publication supprimée avec succès!',
-      placeholderContent: 'Écrivez le contenu de votre publication ici...',
-      confirm: 'Confirmer',
-      cancel: 'Annuler'
-    },
-    aiContent: {
-      title: 'Générateur de contenu IA',
-      caption: 'Générer des légendes et des hashtags',
-      promptLabel: 'Décrivez votre publication:',
-      promptPlaceholder: 'Ex: Une photo d\'un magnifique coucher de soleil sur la savane.',
-      generate: 'Générer du contenu',
-      generatedTitle: 'Contenu généré',
-      copySuccess: 'Copié dans le presse-papiers!',
-      loading: 'Génération de votre contenu en cours...',
-      error: 'Échec de la génération de contenu. Veuillez réessayer.'
-    },
-    analytics: {
-      title: 'Analyses et rapports',
-      placeholder: 'C\'est ici que vous verrez vos rapports de performance. Nous travaillons à l\'intégration des API Facebook, Instagram et X pour vous fournir des analyses détaillées.'
-    },
-    pricing: {
-      title: 'Tarifs pour l\'Afrique',
-      intro: 'Des plans simples et abordables pour vous aider à développer votre entreprise.',
-      plan1: {
-        name: 'Démarreur',
-        price: 'Ksh 1,500',
-        features: ['Jusqu\'à 3 comptes de réseaux sociaux', '15 publications par mois', 'Analyses de base']
-      },
-      plan2: {
-        name: 'Pro',
-        price: 'Ksh 5,000',
-        features: ['Jusqu\'à 10 comptes de réseaux sociaux', 'Publications illimitées', 'Analyses avancées', 'Générateur de contenu IA']
-      },
-      plan3: {
-        name: 'Entreprise',
-        price: 'Contactez-nous',
-        features: ['Comptes illimités', 'Solutions personnalisées', 'Support dédié', 'Intégration de paiement']
-      },
-      buyButton: 'Choisir le plan',
-      paymentSuccess: 'Merci pour votre achat ! Votre paiement simulé a été un succès. Nous vous contacterons sous peu.'
-    },
-    support: {
-      title: 'Support et ressources',
-      whatsapp: 'Support WhatsApp',
-      whatsappDescription: 'Obtenez un support en temps réel de notre équipe sur WhatsApp.',
-      educational: 'Ressources éducatives',
-      educationalDescription: 'Apprenez à maximiser votre présence sur les réseaux sociaux avec nos guides.',
-      resource1: 'Démarrer avec KIZAZI',
-      resource2: 'Maîtriser le planificateur',
-      resource3: 'Guide du contenu généré par l\'IA',
-      link: 'Voir la ressource',
-      chat: 'Discuter avec nous'
-    }
-  },
-  ar: {
-    appName: 'KIZAZI',
-    menu: {
-      dashboard: 'لوحة القيادة',
-      scheduler: 'مجدول المنشورات',
-      analytics: 'التحليلات',
-      aiContent: 'محتوى الذكاء الاصطناعي',
-      pricing: 'الأسعار',
-      support: 'الدعم'
-    },
-    language: 'اللغة',
-    dashboard: {
-      title: 'لوحة القيادة',
-      welcome: 'مرحبًا بك مرة أخرى في KIZAZI!',
-      summary: 'هذا ملخص سريع لأدائك على وسائل التواصل الاجتماعي.',
-      postsScheduled: 'المنشورات المجدولة',
-      engagements: 'التفاعلات',
-      newFollowers: 'متابعون جدد',
-      growthRate: 'معدل النمو',
-      upcomingPosts: 'المنشورات القادمة'
-    },
-    scheduler: {
-      title: 'مجدول المنشورات والتقويم',
-      managePosts: 'إدارة وجدولة منشوراتك على وسائل التواصل الاجتماعي.',
-      createPost: 'إنشاء منشور جديد',
-      editPost: 'تعديل المنشور',
-      platform: 'المنصة',
-      content: 'محتوى المنشور',
-      date: 'تاريخ الجدولة',
-      time: 'وقت الجدولة',
-      schedule: 'جدولة المنشور',
-      update: 'تحديث المنشور',
-      noPosts: 'لا توجد منشورات مجدولة لهذا اليوم.',
-      postScheduled: 'تم جدولة المنشور بنجاح!',
-      postUpdated: 'تم تحديث المنشور بنجاح!',
-      deletePost: 'حذف المنشور',
-      deleteConfirmTitle: 'تأكيد الحذف',
-      deleteConfirm: 'هل أنت متأكد أنك تريد حذف هذا المنشور؟ لا يمكن التراجع عن هذا الإجراء.',
-      deleteSuccess: 'تم حذف المنشور بنجاح!',
-      placeholderContent: 'اكتب محتوى منشورك هنا...',
-      confirm: 'تأكيد',
-      cancel: 'إلغاء'
-    },
-    aiContent: {
-      title: 'مولد محتوى الذكاء الاصطناعي',
-      caption: 'توليد التسميات التوضيحية والهاشتاجات',
-      promptLabel: 'صف منشورك:',
-      promptPlaceholder: 'مثال، صورة لغروب الشمس الجميل على السافانا.',
-      generate: 'توليد المحتوى',
-      generatedTitle: 'المحتوى المُولَّد',
-      copySuccess: 'تم النسخ إلى الحافظة!',
-      loading: 'جارٍ توليد المحتوى الخاص بك...',
-      error: 'فشل توليد المحتوى. يرجى المحاولة مرة أخرى.'
-    },
-    analytics: {
-      title: 'التحليلات والتقارير',
-      placeholder: 'هنا سترى تقارير أداء منصاتك المختلفة. نحن نعمل على دمج واجهات برمجة تطبيقات فيسبوك وإنستغرام و X لتوفير رؤى مفصلة.'
-    },
-    pricing: {
-      title: 'أسعار أفريقيا',
-      intro: 'خطط أسعار بسيطة ومعقولة لمساعدتك على تنمية عملك.',
-      plan1: {
-        name: 'مبتدئ',
-        price: '1,500 شلن',
-        features: ['حتى 3 حسابات على وسائل التواصل الاجتماعي', '15 منشورًا مجدولًا شهريًا', 'تحليلات أساسية']
-      },
-      plan2: {
-        name: 'احترافي',
-        price: '5,000 شلن',
-        features: ['حتى 10 حسابات على وسائل التواصل الاجتماعي', 'منشورات مجدولة غير محدودة', 'تحليلات متقدمة', 'مولد محتوى الذكاء الاصطناعي']
-      },
-      plan3: {
-        name: 'شركات',
-        price: 'اتصل بنا',
-        features: ['حسابات غير محدودة', 'حلول مخصصة', 'دعم مخصص', 'دمج المدفوعات']
-      },
-      buyButton: 'اختر الخطة',
-      paymentSuccess: 'شكرًا لشرائك! لقد تمت عملية الدفع المحاكاة بنجاح. سنتواصل معك قريبًا.'
-    },
-    support: {
-      title: 'الدعم والموارد',
-      whatsapp: 'دعم واتساب',
-      whatsappDescription: 'احصل على دعم فوري من فريقنا على واتساب.',
-      educational: 'الموارد التعليمية',
-      educationalDescription: 'تعلم كيفية زيادة تواجدك على وسائل التواصل الاجتماعي باستخدام أدلتنا.',
-      resource1: 'البدء مع KIZAZI',
-      resource2: 'إتقان مجدول المنشورات',
-      resource3: 'دليل المحتوى المُولَّد بواسطة الذكاء الاصطناعي',
-      link: 'عرض المورد',
-      chat: 'تحدث معنا'
-    }
-  },
-  pt: {
-    appName: 'KIZAZI',
-    menu: {
-      dashboard: 'Painel',
-      scheduler: 'Agendador de Posts',
-      analytics: 'Análise',
-      aiContent: 'Conteúdo de IA',
-      pricing: 'Preços',
-      support: 'Suporte'
-    },
-    language: 'Idioma',
-    dashboard: {
-      title: 'Painel',
-      welcome: 'Bem-vindo de volta ao KIZAZI!',
-      summary: 'Aqui está um resumo rápido do seu desempenho nas redes sociais.',
-      postsScheduled: 'Posts Agendados',
-      engagements: 'Engajamentos',
-      newFollowers: 'Novos Seguidores',
-      growthRate: 'Taxa de Crescimento',
-      upcomingPosts: 'Próximos Posts'
-    },
-    scheduler: {
-      title: 'Agendador de Posts e Calendário',
-      managePosts: 'Gerencie e agende suas postagens nas redes sociais.',
-      createPost: 'Criar um novo post',
-      editPost: 'Editar Post',
-      platform: 'Plataforma',
-      content: 'Conteúdo do Post',
-      date: 'Data do agendamento',
-      time: 'Hora do agendamento',
-      schedule: 'Agendar Post',
-      update: 'Atualizar Post',
-      noPosts: 'Nenhum post agendado para este dia.',
-      postScheduled: 'Post agendado com sucesso!',
-      postUpdated: 'Post atualizado com sucesso!',
-      deletePost: 'Excluir Post',
-      deleteConfirmTitle: 'Confirmar Exclusão',
-      deleteConfirm: 'Tem certeza de que deseja excluir este post? Esta ação não pode ser desfeita.',
-      deleteSuccess: 'Post excluído com sucesso!',
-      placeholderContent: 'Escreva o conteúdo do seu post aqui...',
-      confirm: 'Confirmar',
-      cancel: 'Cancelar'
-    },
-    aiContent: {
-      title: 'Gerador de Conteúdo de IA',
-      caption: 'Gerar legendas e hashtags',
-      promptLabel: 'Descreva seu post:',
-      promptPlaceholder: 'Ex: Uma foto de um lindo pôr do sol na savana.',
-      generate: 'Gerar Conteúdo',
-      generatedTitle: 'Conteúdo Gerado',
-      copySuccess: 'Copiado para a área de transferência!',
-      loading: 'Gerando seu conteúdo...',
-      error: 'Falha ao gerar conteúdo. Por favor, tente novamente.'
-    },
-    analytics: {
-      title: 'Análises e Relatórios',
-      placeholder: 'É aqui que você verá seus relatórios de desempenho. Estamos trabalhando na integração das APIs do Facebook, Instagram e X para fornecer insights detalhados.'
-    },
-    pricing: {
-      title: 'Preços para a África',
-      intro: 'Planos de preços simples e acessíveis para ajudar você a expandir seus negócios.',
-      plan1: {
-        name: 'Iniciante',
-        price: 'Ksh 1,500',
-        features: ['Até 3 contas de mídia social', '15 posts agendados/mês', 'Análise básica']
-      },
-      plan2: {
-        name: 'Pro',
-        price: 'Ksh 5,000',
-        features: ['Até 10 contas de mídia social', 'Posts agendados ilimitados', 'Análise avançada', 'Gerador de conteúdo de IA']
-      },
-      plan3: {
-        name: 'Empresarial',
-        price: 'Fale conosco',
-        features: ['Contas ilimitadas', 'Soluções personalizadas', 'Suporte dedicado', 'Integração de pagamento']
-      },
-      buyButton: 'Escolher Plano',
-      paymentSuccess: 'Obrigado pela sua compra! Seu pagamento simulado foi bem-sucedido. Entraremos em contato em breve.'
-    },
-    support: {
-      title: 'Suporte e Recursos',
-      whatsapp: 'Suporte via WhatsApp',
-      whatsappDescription: 'Obtenha suporte em tempo real de nossa equipe no WhatsApp.',
-      educational: 'Recursos Educacionais',
-      educationalDescription: 'Aprenda a maximizar sua presença nas redes sociais com nossos guias.',
-      resource1: 'Começando com KIZAZI',
-      resource2: 'Dominando o Agendador de Posts',
-      resource3: 'Guia para Conteúdo Gerado por IA',
-      link: 'Ver Recurso',
-      chat: 'Converse conosco'
-    }
-  }
-};
-
-const LanguageContext = createContext();
-
-const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState('en');
-
-  // The 't' function safely navigates the translation object.
-  // If a key is not found, it returns the key itself as a fallback.
-  const t = (key) => {
-    const keys = key.split('.');
-    let text = translations[language];
-    for (const k of keys) {
-      if (text && text[k] !== undefined) {
-        text = text[k];
-      } else {
-        return key;
-      }
-    }
-    return text;
-  };
-
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
-  );
-};
-
-// --- MODE SELECTION COMPONENT ---
-// This component allows users to choose between Demo Mode and Full Authentication Mode
-const ModeSelection = ({ onModeSelect }) => {
-  const [selectedMode, setSelectedMode] = useState(null);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-fuchsia-900 to-pink-900 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl w-full text-center"
-      >
-        {/* Logo and Title */}
-        <motion.div
-          initial={{ scale: 0.5 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mb-12"
-        >
-          <img 
-            src="/logo.jpg" 
-            alt="KIZAZI Logo" 
-            className="h-24 w-auto mx-auto mb-6 rounded-xl shadow-2xl"
-          />
-          <h1 className="text-6xl font-bold text-white mb-4 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-            Welcome to KIZAZI
-          </h1>
-          <p className="text-xl text-purple-200 mb-8">
-            Your AI-Powered Social Media Management Platform
-          </p>
-        </motion.div>
-
-        {/* Mode Selection Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* Demo Mode Card */}
-          <motion.div
-            whileHover={{ scale: 1.05, y: -5 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onModeSelect('demo')}
-            className={`bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 cursor-pointer transition-all duration-300 ${
-              selectedMode === 'demo' ? 'ring-4 ring-green-400 bg-white/20' : 'hover:bg-white/15'
-            }`}
-          >
-            <div className="mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <PlayCircle size={32} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">🎯 Demo Mode</h3>
-              <p className="text-purple-200 mb-4">
-                Explore all features instantly with sample data. Perfect for testing and demonstrations.
-              </p>
-            </div>
-            
-            <div className="space-y-2 text-left">
-              <div className="flex items-center text-green-300">
-                <CheckCircle size={16} className="mr-2" />
-                <span className="text-sm">Instant access - no signup required</span>
-              </div>
-              <div className="flex items-center text-green-300">
-                <CheckCircle size={16} className="mr-2" />
-                <span className="text-sm">Pre-loaded sample data</span>
-              </div>
-              <div className="flex items-center text-green-300">
-                <CheckCircle size={16} className="mr-2" />
-                <span className="text-sm">All features unlocked</span>
-              </div>
-              <div className="flex items-center text-green-300">
-                <CheckCircle size={16} className="mr-2" />
-                <span className="text-sm">Perfect for presentations</span>
-              </div>
-            </div>
-
-            <button className="w-full mt-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300">
-              Start Demo
-            </button>
-          </motion.div>
-
-          {/* Full Mode Card */}
-          <motion.div
-            whileHover={{ scale: 1.05, y: -5 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onModeSelect('full')}
-            className={`bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 cursor-pointer transition-all duration-300 ${
-              selectedMode === 'full' ? 'ring-4 ring-purple-400 bg-white/20' : 'hover:bg-white/15'
-            }`}
-          >
-            <div className="mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap size={32} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">🚀 Full Platform</h3>
-              <p className="text-purple-200 mb-4">
-                Complete experience with your own account, data, and social media connections.
-              </p>
-            </div>
-            
-            <div className="space-y-2 text-left">
-              <div className="flex items-center text-purple-300">
-                <CheckCircle size={16} className="mr-2" />
-                <span className="text-sm">Personal account & data</span>
-              </div>
-              <div className="flex items-center text-purple-300">
-                <CheckCircle size={16} className="mr-2" />
-                <span className="text-sm">Real social media connections</span>
-              </div>
-              <div className="flex items-center text-purple-300">
-                <CheckCircle size={16} className="mr-2" />
-                <span className="text-sm">AI content generation</span>
-              </div>
-              <div className="flex items-center text-purple-300">
-                <CheckCircle size={16} className="mr-2" />
-                <span className="text-sm">Advanced analytics</span>
-              </div>
-            </div>
-
-            <button className="w-full mt-6 bg-gradient-to-r from-purple-500 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-700 transition-all duration-300">
-              Sign In / Register
-            </button>
-          </motion.div>
-        </div>
-
-        {/* Footer */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-purple-300 text-sm"
-        >
-          <p>© 2025 KIZAZI - AI-Powered Social Media Management</p>
-          <p className="mt-2">Choose your experience above to get started</p>
-        </motion.div>
-      </motion.div>
-    </div>
-  );
-};
 
 // --- MAIN APP COMPONENT ---
 // This component provides the Auth, Language and Region contexts and renders the main layout.
 const App = () => {
   return (
-    <RegionProvider>
-      <AppRouter />
-    </RegionProvider>
+    <AuthProvider>
+      <RegionProvider>
+        <LanguageProvider>
+          <AppRouter />
+        </LanguageProvider>
+      </RegionProvider>
+    </AuthProvider>
   );
 };
 
 const AppRouter = () => {
   const { isRegionSelected } = useRegion();
-  const [appMode, setAppMode] = useState('demo'); // Start directly in demo mode to fix styling
-  const [showModeSelection, setShowModeSelection] = useState(false);
+  const { isAuthenticated, loading } = useAuth();
 
-  const handleModeSelect = (mode) => {
-    setAppMode(mode);
-    setShowModeSelection(false);
-  };
+  if (loading) {
+    return <div>Loading...</div>; // Or a proper loading spinner
+  }
 
-  const handleBackToHome = () => {
-    setShowModeSelection(true);
-  };
-
-  // Show region selection first if no region is selected
   if (!isRegionSelected) {
     return <RegionSelection />;
   }
 
-  // Show mode selection if requested
-  if (showModeSelection) {
-    return <ModeSelection onModeSelect={handleModeSelect} />;
+  if (!isAuthenticated) {
+    return <LoginModal isOpen={true} onClose={() => {}} />;
   }
 
-  // Demo Mode
-  if (appMode === 'demo') {
-    return (
-      <LanguageProvider>
-        <AppLayout isDemoMode={true} onBackToHome={handleBackToHome} onShowModeSelection={() => setShowModeSelection(true)} />
-      </LanguageProvider>
-    );
-  }
-
-  // Full Authentication Mode
-  return (
-    <AuthProvider>
-      <LanguageProvider>
-        <ProtectedRoute>
-          <AppLayout isDemoMode={false} onBackToHome={handleBackToHome} onShowModeSelection={() => setShowModeSelection(true)} />
-        </ProtectedRoute>
-      </LanguageProvider>
-    </AuthProvider>
-  );
+  return <AppLayout />;
 };
 
 // --- APP LAYOUT COMPONENT ---
@@ -1494,11 +840,25 @@ const Analytics = () => {
 // Pricing Page
 const Pricing = () => {
   const { t } = useContext(LanguageContext);
+  const { region } = useRegion();
+
   const plans = [
     t('pricing.plan1'),
     t('pricing.plan2'),
     t('pricing.plan3')
   ];
+
+  const getPrice = (planName) => {
+    if (region.name === 'Tanzania') {
+      if (planName === 'Starter') return 'TSh 30,000';
+      if (planName === 'Pro') return 'TSh 100,000';
+    } else {
+      if (planName === 'Starter') return 'Ksh 1,500';
+      if (planName === 'Pro') return 'Ksh 5,000';
+    }
+    return 'Contact us';
+  };
+
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const handlePayment = () => {
@@ -1516,7 +876,7 @@ const Pricing = () => {
         {plans.map((plan, index) => (
           <div key={index} className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 flex flex-col items-center text-center">
             <h2 className="text-2xl font-bold text-gray-800">{plan.name}</h2>
-            <p className="text-4xl font-extrabold text-blue-600 my-4">{plan.price}</p>
+            <p className="text-4xl font-extrabold text-blue-600 my-4">{getPrice(plan.name)}</p>
             <ul className="text-gray-600 space-y-2 text-left mb-6">
               {plan.features.map((feature, i) => (
                 <li key={i} className="flex items-center">

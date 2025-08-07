@@ -44,8 +44,8 @@ const LoginModal = ({ isOpen, onClose }) => {
       }
       onClose();
       resetForm();
-    } catch (error) {
-      setError(error.message);
+    } catch (err) {
+      setError(err.message || 'An unexpected error occurred.');
     } finally {
       setIsLoading(false);
     }

@@ -32,6 +32,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { RegionProvider, useRegion } from './contexts/RegionContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import RegionSelection from './components/RegionSelection';
 import LoginModal from './components/Auth/LoginModal';

@@ -32,9 +32,12 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { RegionProvider, useRegion } from './contexts/RegionContext';
-import { LanguageProvider } from './contexts/LanguageContext';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import LanguageContext from './contexts/LanguageContext';
+import { AuthContext } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import RegionSelection from './components/RegionSelection';
+import ModeSelection from './components/ModeSelection';
 import LoginModal from './components/Auth/LoginModal';
 import apiService from './services/api';
 
@@ -54,21 +57,45 @@ const App = () => {
 
 const AppRouter = () => {
   const { isRegionSelected } = useRegion();
-  const { isAuthenticated, loading } = useAuth();
+  const [appMode, setAppMode] = useState('demo'); // Start directly in demo mode
+  const [showModeSelection, setShowModeSelection] = useState(false);
 
-  if (loading) {
-    return <div>Loading...</div>; // Or a proper loading spinner
-  }
+  const handleModeSelect = (mode) => {
+    setAppMode(mode);
+    setShowModeSelection(false);
+  };
+
+  const handleBackToHome = () => {
+    setShowModeSelection(true);
+  };
 
   if (!isRegionSelected) {
     return <RegionSelection />;
   }
 
-  if (!isAuthenticated) {
-    return <LoginModal isOpen={true} onClose={() => {}} />;
+  if (showModeSelection) {
+    return <ModeSelection onModeSelect={handleModeSelect} />;
   }
 
-  return <AppLayout />;
+  if (appMode === 'demo') {
+    return (
+      <AppLayout 
+        isDemoMode={true} 
+        onBackToHome={handleBackToHome} 
+        onShowModeSelection={() => setShowModeSelection(true)} 
+      />
+    );
+  }
+
+  return (
+    <ProtectedRoute>
+      <AppLayout 
+        isDemoMode={false} 
+        onBackToHome={handleBackToHome} 
+        onShowModeSelection={() => setShowModeSelection(true)} 
+      />
+    </ProtectedRoute>
+  );
 };
 
 // --- APP LAYOUT COMPONENT ---

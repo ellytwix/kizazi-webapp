@@ -583,7 +583,7 @@ const Header = ({ onToggleSidebar, isDemoMode, onShowModeSelection }) => {
 
   return (
     <>
-      <header className="relative z-40 bg-white/90 backdrop-blur-md border-b border-gray-200/50 px-6 py-4 flex items-center justify-between shadow-sm">
+      <header className="bg-white/90 backdrop-blur-md border-b border-gray-200/50 px-6 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-4">
           <button
             onClick={onToggleSidebar}

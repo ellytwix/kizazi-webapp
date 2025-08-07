@@ -11,35 +11,55 @@ export const useRegion = () => {
 };
 
 const regions = {
-  Tanzania: { currency: 'TSh', code: 'TZ' },
-  Kenya: { currency: 'KSh', code: 'KE' },
+  Tanzania: { currency: 'TZS', code: 'TZ', symbol: 'TSh' },
+  Kenya: { currency: 'KES', code: 'KE', symbol: 'KSh' },
 };
 
 export const RegionProvider = ({ children }) => {
-  const [region, setRegion] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const savedRegion = localStorage.getItem('app_region');
     if (savedRegion && regions[savedRegion]) {
-      setRegion({ name: savedRegion, ...regions[savedRegion] });
+      setSelectedRegion(savedRegion);
     }
-    setLoading(false);
   }, []);
 
-  const selectRegion = (regionName) => {
-    if (regions[regionName]) {
-      localStorage.setItem('app_region', regionName);
-      setRegion({ name: regionName, ...regions[regionName] });
-    }
+  const setRegion = (regionName) => {
+    console.log('🌍 RegionContext: Setting region to', regionName);
+    setIsProcessing(true);
+    
+    setTimeout(() => {
+      if (regions[regionName]) {
+        localStorage.setItem('app_region', regionName);
+        setSelectedRegion(regionName);
+        console.log('🌍 RegionContext: Region set successfully to', regionName);
+      }
+      setIsProcessing(false);
+    }, 1000); // Simulate processing time
+  };
+
+  const resetRegion = () => {
+    localStorage.removeItem('app_region');
+    setSelectedRegion(null);
+    setIsProcessing(false);
+  };
+
+  const getCurrentRegion = () => {
+    if (!selectedRegion) return null;
+    return { name: selectedRegion, ...regions[selectedRegion] };
   };
 
   const value = {
-    region,
-    regions,
-    loading,
-    selectRegion,
-    isRegionSelected: !!region,
+    region: selectedRegion,
+    currency: selectedRegion ? regions[selectedRegion].symbol : '',
+    setRegion,
+    resetRegion,
+    isRegionSelected: !!selectedRegion && !isProcessing,
+    isProcessing,
+    getCurrentRegion,
+    regions
   };
 
   return (

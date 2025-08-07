@@ -14,84 +14,103 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
-  // Check if user is logged in on app start
   useEffect(() => {
-    checkAuthStatus();
+    // Check for stored user data
+    const storedUser = localStorage.getItem('kizazi_user');
+    const storedToken = localStorage.getItem('kizazi_token');
+    
+    if (storedUser && storedToken) {
+      try {
+        setUser(JSON.parse(storedUser));
+        console.log('✅ Restored user from storage');
+      } catch (e) {
+        console.log('❌ Failed to restore user from storage');
+        localStorage.removeItem('kizazi_user');
+        localStorage.removeItem('kizazi_token');
+      }
+    }
+    
+    setLoading(false);
   }, []);
 
-  const checkAuthStatus = async () => {
+  const login = async (email, password) => {
     try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        apiService.setToken(token);
-        const response = await apiService.getProfile();
+      setLoading(true);
+      setError('');
+      
+      console.log('🔐 AuthContext: Starting login process');
+      
+      const response = await apiService.login(email, password);
+      
+      console.log('✅ AuthContext: Login response received:', response);
+      
+      if (response.success && response.user && response.token) {
         setUser(response.user);
+        
+        // Store in localStorage
+        localStorage.setItem('kizazi_user', JSON.stringify(response.user));
+        localStorage.setItem('kizazi_token', response.token);
+        
+        console.log('✅ Login successful, user stored');
+        return response;
+      } else {
+        throw new Error('Invalid response format from server');
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      // Clear invalid token
-      localStorage.removeItem('token');
-      apiService.setToken(null);
+      
+    } catch (err) {
+      console.error('❌ AuthContext login error:', err);
+      setError(err.message || 'Login failed');
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (credentials) => {
-    setError(null);
-    setLoading(true);
-    
+  const register = async (name, email, password) => {
     try {
-      const response = await apiService.login(credentials);
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      setError(error.message);
-      throw error;
+      setLoading(true);
+      setError('');
+      
+      console.log('📝 AuthContext: Starting registration process');
+      
+      const response = await apiService.register(name, email, password);
+      
+      console.log('✅ AuthContext: Registration response received:', response);
+      
+      if (response.success && response.user && response.token) {
+        setUser(response.user);
+        
+        // Store in localStorage
+        localStorage.setItem('kizazi_user', JSON.stringify(response.user));
+        localStorage.setItem('kizazi_token', response.token);
+        
+        console.log('✅ Registration successful, user stored');
+        return response;
+      } else {
+        throw new Error('Invalid response format from server');
+      }
+      
+    } catch (err) {
+      console.error('❌ AuthContext registration error:', err);
+      setError(err.message || 'Registration failed');
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (userData) => {
-    setError(null);
-    setLoading(true);
-    
-    try {
-      const response = await apiService.register(userData);
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      setError(error.message);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+  const logout = () => {
+    setUser(null);
+    setError('');
+    localStorage.removeItem('kizazi_user');
+    localStorage.removeItem('kizazi_token');
+    console.log('🔓 User logged out');
   };
 
-  const logout = async () => {
-    try {
-      await apiService.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setUser(null);
-      localStorage.removeItem('token');
-      apiService.setToken(null);
-    }
-  };
-
-  const updateProfile = async (profileData) => {
-    try {
-      const response = await apiService.updateProfile(profileData);
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      setError(error.message);
-      throw error;
-    }
+  const clearError = () => {
+    setError('');
   };
 
   const value = {
@@ -101,9 +120,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    updateProfile,
-    isAuthenticated: !!user,
-    clearError: () => setError(null)
+    clearError,
+    setError
   };
 
   return (
@@ -112,3 +130,6 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export { AuthContext };
+export default AuthContext;

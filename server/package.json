@@ -17,6 +17,7 @@
   "author": "KIZAZI Team",
   "license": "MIT",
   "dependencies": {
+    "@google/generative-ai": "^0.4.0",
     "@tailwindcss/postcss": "^4.1.11",
     "axios": "^1.6.0",
     "bcryptjs": "^2.4.3",

@@ -1,261 +1,111 @@
-// API service for KIZAZI frontend
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+// API service for backend communication
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '/api' 
+  : 'http://localhost:5000/api';
+
+console.log('🌐 API Base URL:', API_BASE_URL);
 
 class ApiService {
   constructor() {
-    this.token = localStorage.getItem('token');
+    this.baseURL = API_BASE_URL;
   }
 
-  // Set authentication token
-  setToken(token) {
-    this.token = token;
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
-    }
-  }
-
-  // Get authentication headers
-  getHeaders() {
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
-    }
-
-    return headers;
-  }
-
-  // Generic API request method
   async request(endpoint, options = {}) {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${this.baseURL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+    
+    console.log('🔗 API Request:', options.method || 'GET', url);
+    
     const config = {
-      headers: this.getHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      credentials: 'include',
       ...options,
     };
 
+    // Add body if it's a string, otherwise stringify
+    if (options.body && typeof options.body === 'object') {
+      config.body = JSON.stringify(options.body);
+    }
+
     try {
-      console.log(`Making request to: ${url}`);
+      console.log('📤 Request config:', { ...config, body: config.body ? 'DATA_PRESENT' : 'NO_BODY' });
+      
       const response = await fetch(url, config);
       
+      console.log('📥 Response status:', response.status, response.statusText);
+      
+      // Handle different response types
+      const contentType = response.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+      
+      console.log('📦 Response data:', data);
+
       if (!response.ok) {
-        let errorMessage;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorData.error || `HTTP error! status: ${response.status}`;
-        } catch {
-          errorMessage = `HTTP error! status: ${response.status} - ${response.statusText}`;
-        }
-        
-        // Enhanced error messages based on status code
-        switch (response.status) {
-          case 400:
-            errorMessage = `Bad Request: ${errorMessage}`;
-            break;
-          case 401:
-            errorMessage = `Authentication failed: ${errorMessage}`;
-            break;
-          case 403:
-            errorMessage = `Access denied: ${errorMessage}`;
-            break;
-          case 404:
-            errorMessage = `Not found: ${errorMessage}`;
-            break;
-          case 500:
-            errorMessage = `Server error: ${errorMessage}`;
-            break;
-          default:
-            errorMessage = `Request failed: ${errorMessage}`;
-        }
-        
-        throw new Error(errorMessage);
+        const error = new Error(data.error || data.message || `HTTP ${response.status}`);
+        error.status = response.status;
+        error.data = data;
+        throw error;
       }
 
-      const data = await response.json();
       return data;
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error('❌ API Error:', error);
       
-      // Handle network errors
+      // Provide user-friendly error messages
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+        throw new Error('Unable to connect to server. Please check your connection.');
       }
       
-      throw error;
+      if (error.status === 401) {
+        throw new Error('Invalid email or password');
+      }
+      
+      if (error.status === 400) {
+        throw new Error(error.data?.error || 'Invalid request data');
+      }
+      
+      if (error.status === 500) {
+        throw new Error('Server error. Please try again.');
+      }
+      
+      throw new Error(error.message || 'Network error occurred');
     }
   }
 
-  // GET request
-  async get(endpoint) {
-    return this.request(endpoint, { method: 'GET' });
-  }
-
-  // POST request
-  async post(endpoint, data) {
-    return this.request(endpoint, {
+  // Auth specific methods
+  async login(email, password) {
+    console.log('🔐 Attempting login for:', email);
+    return this.request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: { email, password }
     });
   }
 
-  // PUT request
-  async put(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(data),
+  async register(name, email, password) {
+    console.log('📝 Attempting registration for:', email);
+    return this.request('/auth/register', {
+      method: 'POST',
+      body: { name, email, password }
     });
   }
 
-  // DELETE request
-  async delete(endpoint) {
-    return this.request(endpoint, { method: 'DELETE' });
-  }
-
-  // --- AUTH ENDPOINTS ---
-  async register(userData) {
-    const response = await this.post('/auth/register', userData);
-    if (response.token) {
-      this.setToken(response.token);
-    }
-    return response;
-  }
-
-  async login(credentials) {
-    const response = await this.post('/auth/login', credentials);
-    if (response.token) {
-      this.setToken(response.token);
-    }
-    return response;
-  }
-
-  async logout() {
-    await this.post('/auth/logout');
-    this.setToken(null);
-  }
-
-  async getProfile() {
-    return this.get('/auth/profile');
-  }
-
-  async updateProfile(profileData) {
-    return this.put('/auth/profile', profileData);
-  }
-
-  async changePassword(passwordData) {
-    return this.put('/auth/change-password', passwordData);
-  }
-
-  // --- POSTS ENDPOINTS ---
-  async getPosts(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    return this.get(`/posts${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getPost(id) {
-    return this.get(`/posts/${id}`);
-  }
-
-  async createPost(postData) {
-    return this.post('/posts', postData);
-  }
-
-  async updatePost(id, postData) {
-    return this.put(`/posts/${id}`, postData);
-  }
-
-  async deletePost(id) {
-    return this.delete(`/posts/${id}`);
-  }
-
-  async getUpcomingPosts() {
-    return this.get('/posts/upcoming/week');
-  }
-
-  async getPostsSummary() {
-    return this.get('/posts/analytics/summary');
-  }
-
-  // --- AI ENDPOINTS ---
-  async generateContent(promptData) {
-    return this.post('/ai/generate-content', promptData);
-  }
-
-  async generateHashtags(contentData) {
-    return this.post('/ai/generate-hashtags', contentData);
-  }
-
-  async improveContent(contentData) {
-    return this.post('/ai/improve-content', contentData);
-  }
-
-  async getAiUsageStats() {
-    return this.get('/ai/usage-stats');
-  }
-
-  // --- ANALYTICS ENDPOINTS ---
-  async getDashboardAnalytics(period = '30') {
-    return this.get(`/analytics/dashboard?period=${period}`);
-  }
-
-  async getPostPerformance(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    return this.get(`/analytics/posts/performance${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getTrends(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    return this.get(`/analytics/trends${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getBestTimes(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    return this.get(`/analytics/best-times${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getHashtagAnalytics(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    return this.get(`/analytics/hashtags${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async exportAnalytics(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    return this.get(`/analytics/export${queryString ? `?${queryString}` : ''}`);
-  }
-
-  // --- SOCIAL MEDIA ENDPOINTS ---
-  async connectSocialAccount(platform, accountData) {
-    return this.post(`/social/connect/${platform}`, accountData);
-  }
-
-  async disconnectSocialAccount(platform, accountId) {
-    return this.delete(`/social/disconnect/${platform}/${accountId}`);
-  }
-
-  async getSocialAccounts() {
-    return this.get('/social/accounts');
-  }
-
-  async publishPost(postId) {
-    return this.post(`/social/publish/${postId}`);
-  }
-
-  async getPostAnalytics(postId) {
-    return this.get(`/social/analytics/${postId}`);
-  }
-
-  async syncAnalytics() {
-    return this.post('/social/sync-analytics');
-  }
-
-  // --- HEALTH CHECK ---
-  async healthCheck() {
-    return this.get('/health');
+  // AI generation
+  async generateContent(prompt) {
+    console.log('🤖 Generating AI content');
+    return this.request('/gemini/generate', {
+      method: 'POST',
+      body: { prompt }
+    });
   }
 }
 
-// Create and export singleton instance
 const apiService = new ApiService();
 export default apiService;

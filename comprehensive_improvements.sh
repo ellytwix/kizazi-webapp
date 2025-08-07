@@ -1,3 +1,443 @@
+#!/bin/bash
+set -e
+cd /var/www/kizazi
+
+echo "🌍 COMPREHENSIVE IMPROVEMENTS FOR KIZAZISOCIAL"
+echo "=============================================="
+
+# 1. Enhanced LanguageContext with East African Languages
+echo "--- 1. Adding multi-language support ---"
+cat > src/contexts/LanguageContext.jsx << 'ENHANCED_LANG'
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+const LanguageContext = createContext();
+
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};
+
+export const LanguageProvider = ({ children }) => {
+  const [language, setLanguage] = useState('en');
+
+  // Load saved language on mount
+  useEffect(() => {
+    const savedLang = localStorage.getItem('app_language');
+    if (savedLang && languages[savedLang]) {
+      setLanguage(savedLang);
+    }
+  }, []);
+
+  const languages = {
+    en: { name: 'English', flag: '🇺🇸' },
+    sw: { name: 'Kiswahili', flag: '🇹🇿' },
+    lg: { name: 'Luganda', flag: '🇺🇬' },
+    fr: { name: 'Français', flag: '🇫🇷' },
+    rw: { name: 'Kinyarwanda', flag: '🇷🇼' }
+  };
+
+  const translations = {
+    en: {
+      // Navigation & UI
+      welcome: 'Welcome to KizaziSocial',
+      selectRegion: 'Select Your Region',
+      chooseExperience: 'Choose Your Experience',
+      demoMode: 'Demo Mode',
+      fullAccess: 'Full Access',
+      exploreFeatures: 'Explore features with sample data',
+      createAccount: 'Create account and manage real campaigns',
+      getStarted: 'Get Started',
+      
+      // Menu items
+      dashboard: 'Dashboard',
+      aiContent: 'AI Content',
+      postScheduler: 'Post Scheduler',
+      analytics: 'Analytics',
+      pricing: 'Pricing',
+      support: 'Support',
+      
+      // Dashboard
+      welcomeBack: 'Welcome back',
+      socialMediaOverview: 'Here\'s your social media overview',
+      scheduledPosts: 'Scheduled Posts',
+      totalReach: 'Total Reach',
+      followers: 'Followers',
+      revenue: 'Revenue',
+      noPosts: 'No posts yet',
+      startCreating: 'Start creating content to see your posts here',
+      createFirstPost: 'Create Your First Post',
+      
+      // AI Content
+      aiContentGenerator: 'AI Content Generator',
+      createEngaging: 'Create engaging content with Gemini AI',
+      describeContent: 'Describe what content you want to create:',
+      generateContent: 'Generate Content',
+      generatedContent: 'Generated Content:',
+      copyToClipboard: 'Copy to Clipboard',
+      
+      // Post Scheduler
+      manageSchedule: 'Manage and schedule your upcoming posts',
+      downloadCalendar: 'Download Calendar',
+      newPost: 'New Post',
+      noScheduled: 'No scheduled posts',
+      scheduleFirst: 'Schedule your first post to get started',
+      scheduleFirstPost: 'Schedule Your First Post',
+      
+      // Pricing
+      choosePlan: 'Choose Your Plan',
+      flexiblePricing: 'Flexible pricing for',
+      mostPopular: 'Most Popular',
+      paymentMethods: 'Payment Methods Available in',
+      securePayments: 'Secure payments powered by trusted mobile money providers',
+      
+      // Forms
+      login: 'Login',
+      signUp: 'Sign Up',
+      register: 'Register',
+      email: 'Email',
+      password: 'Password',
+      fullName: 'Full Name',
+      processing: 'Processing...',
+      dontHaveAccount: 'Don\'t have an account?',
+      alreadyHaveAccount: 'Already have an account?',
+      
+      // Regions & Currency
+      kenya: 'Kenya',
+      tanzania: 'Tanzania',
+      kenyanShilling: 'Kenyan Shilling pricing',
+      tanzanianShilling: 'Tanzanian Shilling pricing',
+      
+      // Common actions
+      continue: 'Continue',
+      cancel: 'Cancel',
+      save: 'Save',
+      delete: 'Delete',
+      edit: 'Edit',
+      close: 'Close',
+      
+      // Status messages
+      settingUpRegion: 'Setting up your region...',
+      loading: 'Loading...',
+      generatingAI: 'Generating with AI...',
+      selected: 'Selected! Processing...',
+      
+      // Post creation
+      createPost: 'Create Post',
+      postContent: 'Post Content',
+      selectPlatform: 'Select Platform',
+      scheduleTime: 'Schedule Time',
+      publishNow: 'Publish Now',
+      scheduleLater: 'Schedule for Later',
+      postCreated: 'Post created successfully!',
+      postScheduled: 'Post scheduled successfully!'
+    },
+    
+    sw: {
+      // Navigation & UI
+      welcome: 'Karibu KizaziSocial',
+      selectRegion: 'Chagua Mkoa Wako',
+      chooseExperience: 'Chagua Uzoefu Wako',
+      demoMode: 'Hali ya Jaribio',
+      fullAccess: 'Ufikiaji Kamili',
+      exploreFeatures: 'Chunguza vipengele na data ya mfano',
+      createAccount: 'Unda akaunti na usimamie kampeni halisi',
+      getStarted: 'Anza',
+      
+      // Menu items
+      dashboard: 'Dashibodi',
+      aiContent: 'Maudhui ya AI',
+      postScheduler: 'Mpangaji wa Machapisho',
+      analytics: 'Uchambuzi',
+      pricing: 'Bei',
+      support: 'Msaada',
+      
+      // Dashboard
+      welcomeBack: 'Karibu tena',
+      socialMediaOverview: 'Hii ni muhtasari wa mitandao yako ya kijamii',
+      scheduledPosts: 'Machapisho Yaliyopangwa',
+      totalReach: 'Jumla ya Kufikia',
+      followers: 'Wafuasi',
+      revenue: 'Mapato',
+      noPosts: 'Hakuna machapisho bado',
+      startCreating: 'Anza kuunda maudhui ili kuona machapisho yako hapa',
+      createFirstPost: 'Unda Chapisho Lako la Kwanza',
+      
+      // AI Content
+      aiContentGenerator: 'Kizalishi cha Maudhui ya AI',
+      createEngaging: 'Unda maudhui yanayovutia na Gemini AI',
+      describeContent: 'Eleza maudhui unayotaka kuunda:',
+      generateContent: 'Zalisha Maudhui',
+      generatedContent: 'Maudhui Yaliyozalishwa:',
+      copyToClipboard: 'Nakili kwenye Ubao wa Kunakili',
+      
+      // Post Scheduler
+      manageSchedule: 'Simamia na upange machapisho yako yanayokuja',
+      downloadCalendar: 'Pakua Kalenda',
+      newPost: 'Chapisho Jipya',
+      noScheduled: 'Hakuna machapisho yaliyopangwa',
+      scheduleFirst: 'Panga chapisho lako la kwanza ili kuanza',
+      scheduleFirstPost: 'Panga Chapisho Lako la Kwanza',
+      
+      // Pricing
+      choosePlan: 'Chagua Mpango Wako',
+      flexiblePricing: 'Bei zinazobadilika kwa',
+      mostPopular: 'Maarufu Zaidi',
+      paymentMethods: 'Njia za Malipo Zinazopatikana',
+      securePayments: 'Malipo salama yanayoendeshwa na watoa huduma wa simu wa kuaminika',
+      
+      // Forms
+      login: 'Ingia',
+      signUp: 'Jisajili',
+      register: 'Sajili',
+      email: 'Barua pepe',
+      password: 'Nywila',
+      fullName: 'Jina Kamili',
+      processing: 'Inachakata...',
+      dontHaveAccount: 'Huna akaunti?',
+      alreadyHaveAccount: 'Una akaunti tayari?',
+      
+      // Regions & Currency
+      kenya: 'Kenya',
+      tanzania: 'Tanzania',
+      kenyanShilling: 'Bei za Shilingi ya Kenya',
+      tanzanianShilling: 'Bei za Shilingi ya Tanzania',
+      
+      // Common actions
+      continue: 'Endelea',
+      cancel: 'Ghairi',
+      save: 'Hifadhi',
+      delete: 'Futa',
+      edit: 'Hariri',
+      close: 'Funga',
+      
+      // Status messages
+      settingUpRegion: 'Inaanzisha mkoa wako...',
+      loading: 'Inapakia...',
+      generatingAI: 'Inazalisha na AI...',
+      selected: 'Imechaguliwa! Inachakata...',
+      
+      // Post creation
+      createPost: 'Unda Chapisho',
+      postContent: 'Maudhui ya Chapisho',
+      selectPlatform: 'Chagua Jukwaa',
+      scheduleTime: 'Panga Wakati',
+      publishNow: 'Chapisha Sasa',
+      scheduleLater: 'Panga kwa Baadaye',
+      postCreated: 'Chapisho limeundwa kwa ufanisi!',
+      postScheduled: 'Chapisho limepangwa kwa ufanisi!'
+    },
+    
+    lg: {
+      // Navigation & UI
+      welcome: 'Tusanyuse ku KizaziSocial',
+      selectRegion: 'Londako Ekitundu Kyo',
+      chooseExperience: 'Londako Obumanyirivu Bwo',
+      demoMode: 'Engeri ya Okugezesa',
+      fullAccess: 'Okutuuka Okujjuvu',
+      exploreFeatures: 'Noonyereza ebitundu n\'obubaka obw\'ekyokulabirako',
+      createAccount: 'Tondawo akawunti olungamye kampeyini entuufu',
+      getStarted: 'Tandika',
+      
+      // Menu items  
+      dashboard: 'Dashboodi',
+      aiContent: 'Ebintu bya AI',
+      postScheduler: 'Omupanga w\'Ebiwandiiko',
+      analytics: 'Okwekenenya',
+      pricing: 'Emiwendo',
+      support: 'Obuyambi',
+      
+      // Common translations
+      login: 'Yingira',
+      signUp: 'Weekolerere',
+      register: 'Weekolerere',
+      email: 'Email',
+      password: 'Ekigambo ky\'okukweka',
+      continue: 'Genda mu maaso',
+      loading: 'Kitegekeka...',
+      kenya: 'Kenya',
+      tanzania: 'Tanzania'
+    },
+    
+    fr: {
+      // Navigation & UI
+      welcome: 'Bienvenue sur KizaziSocial',
+      selectRegion: 'Sélectionnez Votre Région',
+      chooseExperience: 'Choisissez Votre Expérience',
+      demoMode: 'Mode Démo',
+      fullAccess: 'Accès Complet',
+      exploreFeatures: 'Explorez les fonctionnalités avec des données d\'exemple',
+      createAccount: 'Créez un compte et gérez de vraies campagnes',
+      getStarted: 'Commencer',
+      
+      // Menu items
+      dashboard: 'Tableau de Bord',
+      aiContent: 'Contenu IA',
+      postScheduler: 'Planificateur de Posts',
+      analytics: 'Analyses',
+      pricing: 'Tarification',
+      support: 'Support',
+      
+      // Common translations
+      login: 'Connexion',
+      signUp: 'S\'inscrire',
+      register: 'S\'inscrire',
+      email: 'Email',
+      password: 'Mot de passe',
+      continue: 'Continuer',
+      loading: 'Chargement...',
+      kenya: 'Kenya',
+      tanzania: 'Tanzanie'
+    },
+    
+    rw: {
+      // Navigation & UI
+      welcome: 'Murakaza neza kuri KizaziSocial',
+      selectRegion: 'Hitamo Akarere Kawe',
+      chooseExperience: 'Hitamo Uburambe Bwawe',
+      demoMode: 'Uburyo bwo Kugerageza',
+      fullAccess: 'Kwinjira Kwuzuye',
+      exploreFeatures: 'Shakisha ibintu hamwe n\'amakuru y\'urugero',
+      createAccount: 'Kora konti ugenzure kampeyini nyazo',
+      getStarted: 'Tangira',
+      
+      // Menu items
+      dashboard: 'Imbonerahamwe',
+      aiContent: 'Ibirimo bya AI',
+      postScheduler: 'Umugenzuzi w\'Ubutumwa',
+      analytics: 'Isesengura',
+      pricing: 'Ibiciro',
+      support: 'Ubufasha',
+      
+      // Common translations
+      login: 'Kwinjira',
+      signUp: 'Kwiyandikisha',
+      register: 'Kwiyandikisha',
+      email: 'Email',
+      password: 'Ijambo banga',
+      continue: 'Komeza',
+      loading: 'Birategekwa...',
+      kenya: 'Kenya',
+      tanzania: 'Tanzaniya'
+    }
+  };
+
+  const t = (key) => {
+    const keys = key.split('.');
+    let value = translations[language];
+    
+    for (const k of keys) {
+      value = value?.[k];
+    }
+    
+    return value || translations.en[key] || key;
+  };
+
+  const changeLanguage = (newLang) => {
+    if (languages[newLang]) {
+      setLanguage(newLang);
+      localStorage.setItem('app_language', newLang);
+    }
+  };
+
+  const value = {
+    language,
+    languages,
+    setLanguage: changeLanguage,
+    t,
+    currentLanguage: languages[language]
+  };
+
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+export default LanguageContext;
+ENHANCED_LANG
+
+# 2. Fix RegionContext to properly handle region transitions
+echo "--- 2. Fixing RegionContext for smooth transitions ---"
+cat > src/contexts/RegionContext.jsx << 'FIXED_REGION'
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+const RegionContext = createContext();
+
+export const useRegion = () => {
+  const context = useContext(RegionContext);
+  if (!context) {
+    throw new Error('useRegion must be used within a RegionProvider');
+  }
+  return context;
+};
+
+const regions = {
+  Tanzania: { currency: 'TZS', code: 'TZ', symbol: 'TSh' },
+  Kenya: { currency: 'KES', code: 'KE', symbol: 'KSh' },
+};
+
+export const RegionProvider = ({ children }) => {
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    const savedRegion = localStorage.getItem('app_region');
+    if (savedRegion && regions[savedRegion]) {
+      setSelectedRegion(savedRegion);
+    }
+  }, []);
+
+  const setRegion = (regionName) => {
+    console.log('🌍 RegionContext: Setting region to', regionName);
+    setIsProcessing(true);
+    
+    setTimeout(() => {
+      if (regions[regionName]) {
+        localStorage.setItem('app_region', regionName);
+        setSelectedRegion(regionName);
+        console.log('🌍 RegionContext: Region set successfully to', regionName);
+      }
+      setIsProcessing(false);
+    }, 1000); // Simulate processing time
+  };
+
+  const resetRegion = () => {
+    localStorage.removeItem('app_region');
+    setSelectedRegion(null);
+    setIsProcessing(false);
+  };
+
+  const getCurrentRegion = () => {
+    if (!selectedRegion) return null;
+    return { name: selectedRegion, ...regions[selectedRegion] };
+  };
+
+  const value = {
+    region: selectedRegion,
+    currency: selectedRegion ? regions[selectedRegion].symbol : '',
+    setRegion,
+    resetRegion,
+    isRegionSelected: !!selectedRegion && !isProcessing,
+    isProcessing,
+    getCurrentRegion,
+    regions
+  };
+
+  return (
+    <RegionContext.Provider value={value}>
+      {children}
+    </RegionContext.Provider>
+  );
+};
+FIXED_REGION
+
+# 3. Create enhanced App.jsx with all improvements
+echo "--- 3. Creating enhanced App.jsx with all improvements ---"
+cat > src/App.jsx << 'ENHANCED_APP'
 import React, { useState, useContext, useEffect } from 'react';
 import { Menu, X, Bell, User, Calendar, BarChart3, DollarSign, HeadphonesIcon, Settings, Upload, Hash, AlertTriangle, Download, FileDown, Globe } from 'lucide-react';
 import { AuthProvider, useAuth, AuthContext } from './contexts/AuthContext';
@@ -1482,3 +1922,65 @@ const App = () => {
 };
 
 export default App;
+ENHANCED_APP
+
+# 4. Build the enhanced application
+echo "--- 4. Building enhanced application ---"
+npm run build --silent
+
+if [ $? -eq 0 ]; then
+    echo "✅ Build successful!"
+    chown -R www-data:www-data dist src
+    chmod -R 755 dist src
+    
+    echo ""
+    echo "🎉 ALL IMPROVEMENTS IMPLEMENTED!"
+    echo ""
+    echo "✅ NEW FEATURES:"
+    echo "   🌍 Language Toggle: English, Swahili, Luganda, French, Kinyarwanda"
+    echo "   🔧 Fixed Region Selection: Smooth transitions, no more stuck loading"
+    echo "   📊 Demo Data: Sample posts, analytics for demo accounts"
+    echo "   📝 Functional Post Creation: Working 'New Post' buttons with scheduling"
+    echo "   🎨 Enhanced UI: Multi-language support throughout"
+    echo ""
+    echo "🌟 LANGUAGES SUPPORTED:"
+    echo "   🇺🇸 English (en)"
+    echo "   🇹🇿 Kiswahili (sw)"
+    echo "   🇺🇬 Luganda (lg)"
+    echo "   🇫🇷 Français (fr)"
+    echo "   🇷🇼 Kinyarwanda (rw)"
+    echo ""
+    echo "📱 USER EXPERIENCE:"
+    echo "   - Demo users: See sample data and can create posts"
+    echo "   - Real users: Start with clean slate, can build their own data"
+    echo "   - Language toggle available in header and initial screens"
+    echo "   - Post creation modal with platform selection and scheduling"
+    echo ""
+    echo "🔄 Hard refresh your browser to see all improvements!"
+else
+    echo "❌ Build failed"
+fi
+
+# 5. Commit changes to GitHub
+echo "--- 5. Syncing with GitHub repository ---"
+git add .
+git commit -m "feat: Add multi-language support and functional post creation
+
+- Added 5 East African languages (English, Swahili, Luganda, French, Kinyarwanda)
+- Fixed region selection stuck loading issue
+- Added demo data for demo accounts while keeping user accounts clean
+- Implemented functional post creation and scheduling
+- Enhanced UI with language toggle in header
+- Improved user experience with proper state management"
+
+git push origin main
+
+echo ""
+echo "🚀 All improvements deployed and synced with GitHub!"
+echo "📱 Your KizaziSocial platform now supports:"
+echo "   ✅ Multi-language interface"
+echo "   ✅ Smooth region selection"
+echo "   ✅ Functional post creation"
+echo "   ✅ Demo data for testing"
+echo "   ✅ Clean experience for real users"
+

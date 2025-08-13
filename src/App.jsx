@@ -7,6 +7,8 @@ import { RegionProvider, useRegion } from './contexts/RegionContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiService from './services/api';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
+import DataDeletion from './components/DataDeletion';
 
 // Backend Status Component
 const BackendStatus = () => {
@@ -1499,6 +1501,24 @@ const PrivacyPolicyPage = () => {
   );
 };
 
+// Terms of Service Wrapper Component
+const TermsOfServicePage = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <TermsOfService onBack={() => navigate('/')} />
+  );
+};
+
+// Data Deletion Wrapper Component
+const DataDeletionPage = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <DataDeletion onBack={() => navigate('/')} />
+  );
+};
+
 // Main App Component with Router
 const App = () => {
   return (
@@ -1508,6 +1528,8 @@ const App = () => {
           <AuthProvider>
             <Routes>
               <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms" element={<TermsOfServicePage />} />
+              <Route path="/data-deletion" element={<DataDeletionPage />} />
               <Route path="/" element={<AppRouter />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

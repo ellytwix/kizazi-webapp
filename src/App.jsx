@@ -1,10 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, Bell, User, Calendar, BarChart3, DollarSign, HeadphonesIcon, Settings, Upload, Hash, AlertTriangle, Download, FileDown, Globe } from 'lucide-react';
 import { AuthProvider, useAuth, AuthContext } from './contexts/AuthContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { RegionProvider, useRegion } from './contexts/RegionContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiService from './services/api';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 // Backend Status Component
 const BackendStatus = () => {
@@ -736,6 +738,16 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
           <div className="bg-gradient-to-r from-pink-600/20 to-purple-600/20 rounded-lg p-3 text-center backdrop-blur-sm">
             <div className="text-2xl mb-1">🌟</div>
             <div className="text-white text-sm">Enhanced v2.0</div>
+            <div className="mt-2 pt-2 border-t border-white/20">
+              <a 
+                href="/privacy" 
+                className="text-white/80 hover:text-white text-xs underline transition"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Privacy Policy
+              </a>
+            </div>
           </div>
         </div>
       </aside>
@@ -1364,6 +1376,16 @@ const Support = () => {
         </div>
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 p-6">
           <p className="text-gray-600 text-lg">Get in touch with our support team for assistance.</p>
+          
+          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+            <p className="text-gray-500 text-sm">
+              © 2025 KIZAZI Africa Ltd. All rights reserved. | 
+              <a href="/privacy" className="text-pink-600 hover:underline ml-2" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+            </p>
+            <p className="text-gray-400 text-xs mt-2">
+              Made with ❤️ for Africa by the KIZAZI Team
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -1468,16 +1490,31 @@ const AppRouter = () => {
   );
 };
 
-// Main App Component
+// Privacy Policy Wrapper Component
+const PrivacyPolicyPage = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <PrivacyPolicy onBack={() => navigate('/')} />
+  );
+};
+
+// Main App Component with Router
 const App = () => {
   return (
-    <RegionProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <AppRouter />
-        </AuthProvider>
-      </LanguageProvider>
-    </RegionProvider>
+    <Router>
+      <RegionProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <Routes>
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/" element={<AppRouter />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AuthProvider>
+        </LanguageProvider>
+      </RegionProvider>
+    </Router>
   );
 };
 

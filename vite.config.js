@@ -5,7 +5,6 @@ import autoprefixer from 'autoprefixer'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/kizazi-webapp/',
   plugins: [react()],
   css: {
     postcss: {

@@ -350,8 +350,8 @@ const PrivacyPolicy = ({ onBack }) => {
                 <Mail className="w-5 h-5 text-pink-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Email</h4>
-                  <p className="text-gray-600">privacy@kizazi.africa</p>
-                  <p className="text-gray-600">support@kizazi.africa</p>
+                  <p className="text-gray-600">privacy@kizazisocial.com</p>
+                  <p className="text-gray-600">support@kizazisocial.com</p>
                 </div>
               </div>
               
@@ -359,8 +359,7 @@ const PrivacyPolicy = ({ onBack }) => {
                 <Phone className="w-5 h-5 text-pink-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Phone</h4>
-                  <p className="text-gray-600">Kenya: +254 700 000 000</p>
-                  <p className="text-gray-600">Tanzania: +255 700 000 000</p>
+                  <p className="text-gray-600">Tanzania: +255 765 416 502</p>
                 </div>
               </div>
               
@@ -368,8 +367,8 @@ const PrivacyPolicy = ({ onBack }) => {
                 <MapPin className="w-5 h-5 text-pink-500 mt-1" />
                 <div>
                   <h4 className="font-semibold text-gray-800">Address</h4>
-                  <p className="text-gray-600">KIZAZI Africa Ltd.</p>
-                  <p className="text-gray-600">Nairobi, Kenya</p>
+                  <p className="text-gray-600">KIZAZI Social Ltd.</p>
+                  <p className="text-gray-600">Dar es Salaam, Tanzania</p>
                 </div>
               </div>
             </div>
@@ -377,7 +376,7 @@ const PrivacyPolicy = ({ onBack }) => {
             <div className="mt-6 p-4 bg-white rounded-lg border border-pink-200">
               <h4 className="font-semibold text-gray-800 mb-2">Data Protection Officer</h4>
               <p className="text-gray-600">For data protection inquiries specific to your region:</p>
-              <p className="text-gray-600">Email: dpo@kizazi.africa</p>
+              <p className="text-gray-600">Email: dpo@kizazisocial.com</p>
               <p className="text-gray-600">We will respond to your inquiry within 30 days.</p>
             </div>
           </section>
@@ -385,7 +384,7 @@ const PrivacyPolicy = ({ onBack }) => {
           {/* Footer */}
           <div className="text-center py-6 border-t border-gray-200">
             <p className="text-gray-500 text-sm">
-              © 2025 KIZAZI Africa Ltd. All rights reserved. | 
+              © 2025 KIZAZI Social Ltd. All rights reserved. | 
               <a href="/terms" className="text-pink-600 hover:underline ml-2">Terms of Service</a> | 
               <a href="/privacy" className="text-pink-600 hover:underline ml-2">Privacy Policy</a>
             </p>

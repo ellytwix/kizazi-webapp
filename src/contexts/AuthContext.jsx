@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       
       console.log('✅ AuthContext: Login response received:', response);
       
-      if (response.success && response.user && response.token) {
+      if (response.user && response.token) {
         setUser(response.user);
         
         // Store in localStorage
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
       
       console.log('✅ AuthContext: Registration response received:', response);
       
-      if (response.success && response.user && response.token) {
+      if (response.user && response.token) {
         setUser(response.user);
         
         // Store in localStorage

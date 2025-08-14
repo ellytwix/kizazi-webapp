@@ -267,6 +267,187 @@ router.get('/deletion-status/:code', async (req, res) => {
 });
 
 /**
+ * Post to Facebook Page
+ * URL: https://kizazisocial.com/api/meta/post/facebook
+ */
+router.post('/post/facebook', async (req, res) => {
+  try {
+    const { content, hashtags, accountId, accessToken, media, scheduledFor } = req.body;
+    
+    if (!content || !accountId || !accessToken) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    const postContent = content + (hashtags?.length > 0 ? '\n\n' + hashtags.join(' ') : '');
+    
+    const postData = {
+      message: postContent,
+      access_token: accessToken
+    };
+    
+    // Add media if provided
+    if (media && media.length > 0) {
+      postData.link = media[0].url;
+    }
+    
+    // Schedule post if needed
+    if (scheduledFor) {
+      const scheduleTime = Math.floor(new Date(scheduledFor).getTime() / 1000);
+      postData.scheduled_publish_time = scheduleTime;
+      postData.published = false;
+    }
+    
+    const response = await fetch(`https://graph.facebook.com/v18.0/${accountId}/feed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(postData)
+    });
+    
+    const data = await response.json();
+    
+    if (data.error) {
+      console.error('Facebook posting error:', data.error);
+      return res.status(400).json({ error: data.error.message });
+    }
+    
+    console.log('Facebook post successful:', { id: data.id, scheduled: !!scheduledFor });
+    
+    res.json({
+      success: true,
+      platform: 'Facebook',
+      postId: data.id,
+      scheduled: !!scheduledFor,
+      message: scheduledFor ? 'Post scheduled successfully' : 'Post published successfully'
+    });
+    
+  } catch (error) {
+    console.error('Facebook post error:', error);
+    res.status(500).json({ error: 'Failed to post to Facebook' });
+  }
+});
+
+/**
+ * Post to Instagram Business Account
+ * URL: https://kizazisocial.com/api/meta/post/instagram
+ */
+router.post('/post/instagram', async (req, res) => {
+  try {
+    const { content, hashtags, accountId, accessToken, media } = req.body;
+    
+    if (!content || !accountId || !accessToken) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    if (!media || media.length === 0) {
+      return res.status(400).json({ error: 'Instagram posts require media (image or video)' });
+    }
+    
+    const caption = content + (hashtags?.length > 0 ? '\n\n' + hashtags.join(' ') : '');
+    
+    // Step 1: Create media container
+    const mediaData = {
+      image_url: media[0].url,
+      caption: caption,
+      access_token: accessToken
+    };
+    
+    const mediaResponse = await fetch(`https://graph.facebook.com/v18.0/${accountId}/media`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(mediaData)
+    });
+    
+    const mediaResult = await mediaResponse.json();
+    
+    if (mediaResult.error) {
+      console.error('Instagram media creation error:', mediaResult.error);
+      return res.status(400).json({ error: mediaResult.error.message });
+    }
+    
+    // Step 2: Publish the media
+    const publishData = {
+      creation_id: mediaResult.id,
+      access_token: accessToken
+    };
+    
+    const publishResponse = await fetch(`https://graph.facebook.com/v18.0/${accountId}/media_publish`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(publishData)
+    });
+    
+    const publishResult = await publishResponse.json();
+    
+    if (publishResult.error) {
+      console.error('Instagram publishing error:', publishResult.error);
+      return res.status(400).json({ error: publishResult.error.message });
+    }
+    
+    console.log('Instagram post successful:', { id: publishResult.id });
+    
+    res.json({
+      success: true,
+      platform: 'Instagram',
+      postId: publishResult.id,
+      message: 'Post published successfully to Instagram'
+    });
+    
+  } catch (error) {
+    console.error('Instagram post error:', error);
+    res.status(500).json({ error: 'Failed to post to Instagram' });
+  }
+});
+
+/**
+ * Get Analytics for Connected Accounts
+ * URL: https://kizazisocial.com/api/meta/analytics/:accountId
+ */
+router.get('/analytics/:accountId', async (req, res) => {
+  try {
+    const { accountId } = req.params;
+    const { accessToken, platform, period = '30d' } = req.query;
+    
+    if (!accessToken) {
+      return res.status(400).json({ error: 'Access token required' });
+    }
+    
+    let insights;
+    
+    if (platform === 'Facebook') {
+      // Facebook Page Insights
+      const response = await fetch(
+        `https://graph.facebook.com/v18.0/${accountId}/insights?metric=page_impressions,page_reach,page_actions&period=days_28&access_token=${accessToken}`
+      );
+      insights = await response.json();
+    } else if (platform === 'Instagram') {
+      // Instagram Business Account Insights
+      const response = await fetch(
+        `https://graph.facebook.com/v18.0/${accountId}/insights?metric=impressions,reach,profile_views&period=days_28&access_token=${accessToken}`
+      );
+      insights = await response.json();
+    }
+    
+    if (insights?.error) {
+      console.error('Analytics error:', insights.error);
+      return res.status(400).json({ error: insights.error.message });
+    }
+    
+    res.json({
+      success: true,
+      platform,
+      accountId,
+      period,
+      data: insights.data || [],
+      last_updated: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Analytics error:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics' });
+  }
+});
+
+/**
  * Meta App Analytics Endpoint
  * URL: https://kizazisocial.com/api/meta/analytics
  */

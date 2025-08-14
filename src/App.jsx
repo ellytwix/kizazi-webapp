@@ -9,6 +9,9 @@ import apiService from './services/api';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import DataDeletion from './components/DataDeletion';
+import SocialMediaConnect from './components/SocialMediaConnect';
+import PostCreator from './components/PostCreator';
+import Analytics from './components/Analytics';
 
 // Backend Status Component
 const BackendStatus = () => {
@@ -127,7 +130,7 @@ const RegionSelection = () => {
   };
 
   if (isProcessing) {
-    return (
+  return (
       <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
         <motion.div 
           initial={{ opacity: 0 }}
@@ -215,16 +218,16 @@ const ModeSelection = ({ onModeSelect }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl w-full"
       >
         <div className="text-center mb-8">
           <img src="/kizazi-logo.png" alt="KizaziSocial" className="w-20 h-20 mx-auto mb-4" />
           <h1 className="text-4xl font-bold text-white mb-2">{t('chooseExperience')}</h1>
           <p className="text-pink-200 text-lg">How would you like to get started?</p>
-        </div>
+      </div>
         
         {/* Language toggle in mode selection */}
         <div className="flex justify-center mb-6">
@@ -455,7 +458,7 @@ const LoginModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <motion.div 
+              <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
@@ -466,7 +469,7 @@ const LoginModal = ({ isOpen, onClose }) => {
           </h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X size={24} />
-          </button>
+                </button>
         </div>
 
         {error && (
@@ -502,26 +505,26 @@ const LoginModal = ({ isOpen, onClose }) => {
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
             required
           />
-          <button
+                <button
             type="submit"
             disabled={loading}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white p-3 rounded-lg hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 transition"
-          >
+                >
             {loading ? t('processing') : (isLoginMode ? t('login') : t('signUp'))}
-          </button>
+                </button>
         </form>
 
         <p className="text-center mt-4 text-gray-600">
           {isLoginMode ? t('dontHaveAccount') : t('alreadyHaveAccount')}
-          <button
+                <button
             onClick={() => setIsLoginMode(!isLoginMode)}
             className="text-pink-600 hover:underline ml-1"
-          >
+                >
             {isLoginMode ? t('signUp') : t('login')}
-          </button>
+                </button>
         </p>
-      </motion.div>
-    </div>
+              </motion.div>
+        </div>
   );
 };
 
@@ -594,7 +597,7 @@ const Header = ({ onToggleSidebar, isDemoMode, onShowModeSelection }) => {
             className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition"
           >
             <Menu size={20} />
-          </button>
+            </button>
           <div className="flex items-center gap-3">
             <img src="/kizazi-logo.png" alt="KizaziSocial" className="w-10 h-10" />
             <h1 className="text-xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
@@ -611,12 +614,12 @@ const Header = ({ onToggleSidebar, isDemoMode, onShowModeSelection }) => {
               <span className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow">
                 ✨ {t('demoMode')}
               </span>
-              <button
+                  <button
                 onClick={resetRegion}
                 className="text-sm text-pink-600 hover:text-pink-800 font-medium transition"
               >
                 Switch Region
-              </button>
+                  </button>
               <button
                 onClick={onShowModeSelection}
                 className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg text-sm transition shadow"
@@ -628,13 +631,13 @@ const Header = ({ onToggleSidebar, isDemoMode, onShowModeSelection }) => {
 
           {!isDemoMode && user && (
             <div className="relative">
-              <button
+                <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition"
               >
                 <User size={20} />
                 <span className="hidden sm:block">{user.name}</span>
-              </button>
+                </button>
               
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
@@ -647,9 +650,9 @@ const Header = ({ onToggleSidebar, isDemoMode, onShowModeSelection }) => {
                   >
                     Logout
                   </button>
-                </div>
+        </div>
               )}
-            </div>
+      </div>
           )}
 
           {!isDemoMode && !user && (
@@ -677,6 +680,8 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
   
   const menuItems = [
     { id: 'dashboard', label: t('dashboard'), icon: BarChart3 },
+    { id: 'connect-accounts', label: 'Connect Accounts', icon: Settings, isNew: true },
+    { id: 'create-post', label: 'Create Post', icon: Upload, isNew: true },
     { id: 'ai-content', label: t('aiContent'), icon: Upload },
     { id: 'post-scheduler', label: t('postScheduler'), icon: Calendar },
     { id: 'analytics', label: t('analytics'), icon: BarChart3 },
@@ -704,22 +709,27 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
             <div className="flex items-center gap-2">
               <img src="/kizazi-logo.png" alt="KIZAZI" className="w-8 h-8" />
               <span className="text-white font-bold text-lg">KIZAZI</span>
-            </div>
+              </div>
             <button
               onClick={onClose}
               className="lg:hidden text-white/70 hover:text-white transition"
             >
               <X size={20} />
             </button>
-          </div>
-        </div>
+              </div>
+            </div>
         
         <nav className="px-4 space-y-2">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => {
-                setActiveSection(item.id);
+                if (item.id === 'connect-accounts' || item.id === 'create-post') {
+                  // Navigate to new routes
+                  window.location.href = `/${item.id}`;
+                } else {
+                  setActiveSection(item.id);
+                }
                 onClose();
               }}
               className={`
@@ -732,6 +742,11 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
             >
               <item.icon size={20} />
               <span className="font-medium">{item.label}</span>
+              {item.isNew && (
+                <span className="ml-auto px-2 py-1 text-xs bg-green-500 text-white rounded-full">
+                  NEW
+                </span>
+              )}
             </button>
           ))}
         </nav>
@@ -749,9 +764,9 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
               >
                 Privacy Policy
               </a>
-            </div>
-          </div>
-        </div>
+                  </div>
+              </div>
+              </div>
       </aside>
     </>
   );
@@ -829,7 +844,7 @@ const Dashboard = () => {
             <div className="flex items-center">
               <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
                 <BarChart3 className="h-6 w-6 text-white" />
-              </div>
+      </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">{t('totalReach')}</p>
                 <p className="text-2xl font-semibold text-gray-900">{stats.totalReach.toLocaleString()}</p>
@@ -841,31 +856,31 @@ const Dashboard = () => {
             <div className="flex items-center">
               <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg">
                 <User className="h-6 w-6 text-white" />
-              </div>
+                      </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">{t('followers')}</p>
                 <p className="text-2xl font-semibold text-gray-900">{stats.followers.toLocaleString()}</p>
-              </div>
-            </div>
-          </div>
+                    </div>
+                  </div>
+                </div>
           
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-200/50">
             <div className="flex items-center">
               <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg">
                 <DollarSign className="h-6 w-6 text-white" />
-              </div>
+                </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">{t('revenue')}</p>
                 <p className="text-2xl font-semibold text-gray-900">{currency} {stats.revenue.toLocaleString()}</p>
               </div>
             </div>
-          </div>
         </div>
+      </div>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Your Posts</h2>
-          </div>
+            </div>
           <div className="p-6">
             {samplePosts.length === 0 ? (
               <div className="text-center py-12">
@@ -875,7 +890,7 @@ const Dashboard = () => {
                 <button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-lg hover:from-pink-600 hover:to-purple-600 transition">
                   {t('createFirstPost')}
                 </button>
-              </div>
+            </div>
             ) : (
               <div className="space-y-4">
                 {samplePosts.map((post) => (
@@ -887,11 +902,11 @@ const Dashboard = () => {
                         <span>{post.platform}</span>
                         <span>{post.date}</span>
                         <span>❤️ {post.likes}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
+              </div>
+            </div>
+                ))}
+            </div>
             )}
           </div>
         </div>
@@ -934,7 +949,7 @@ const AIContentGenerator = () => {
         setError('');
       } else if (response.error) {
         throw new Error(response.error);
-      } else {
+    } else {
         throw new Error('No content generated');
       }
       
@@ -964,7 +979,7 @@ const AIContentGenerator = () => {
                 {t('describeContent')}
               </label>
               <textarea
-                value={prompt}
+              value={prompt}
                 onChange={(e) => {
                   setPrompt(e.target.value);
                   setError('');
@@ -972,8 +987,8 @@ const AIContentGenerator = () => {
                 placeholder="e.g., Write a social media post about sustainable tourism in Kenya..."
                 className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
                 rows={4}
-              />
-            </div>
+            />
+          </div>
             
             {error && (
               <div className="p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
@@ -981,8 +996,8 @@ const AIContentGenerator = () => {
               </div>
             )}
             
-            <button
-              onClick={handleGenerate}
+          <button
+            onClick={handleGenerate}
               disabled={loading || !prompt.trim()}
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 transition-all"
             >
@@ -994,20 +1009,20 @@ const AIContentGenerator = () => {
               ) : (
                 t('generateContent')
               )}
-            </button>
-          </div>
-          
-          {generatedContent && (
+          </button>
+        </div>
+
+        {generatedContent && (
             <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <h3 className="font-semibold text-gray-800 mb-2">{t('generatedContent')}</h3>
               <p className="text-gray-700 whitespace-pre-wrap">{generatedContent}</p>
-              <button
+                <button
                 onClick={() => navigator.clipboard.writeText(generatedContent)}
                 className="mt-3 text-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-pink-600 hover:to-purple-600 transition"
-              >
+                >
                 {t('copyToClipboard')}
-              </button>
-            </div>
+                </button>
+              </div>
           )}
         </div>
       </div>
@@ -1082,7 +1097,7 @@ END:VCALENDAR`;
             <p className="text-gray-600 mt-1">{t('manageSchedule')}</p>
           </div>
           <div className="flex gap-3">
-            <button 
+                <button
               onClick={downloadCalendar}
               className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-lg shadow hover:from-emerald-600 hover:to-teal-600 transition-all transform hover:scale-105"
             >
@@ -1094,8 +1109,8 @@ END:VCALENDAR`;
               className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-lg shadow hover:from-pink-600 hover:to-purple-600 transition-all transform hover:scale-105"
             >
               {t('newPost')}
-            </button>
-          </div>
+                </button>
+              </div>
         </div>
         
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200/50">
@@ -1131,16 +1146,16 @@ END:VCALENDAR`;
                 </div>
               ))}
             </div>
-          )}
-        </div>
+        )}
+      </div>
         
         <PostCreationModal
           isOpen={showPostModal}
           onClose={() => setShowPostModal(false)}
           onPostCreated={handlePostCreated}
         />
+        </div>
       </div>
-    </div>
   );
 };
 
@@ -1218,8 +1233,8 @@ const RegionalPricing = () => {
             {t('choosePlan')}
           </h1>
           <p className="text-gray-600 text-lg">{t('flexiblePricing')} {region}</p>
-        </div>
-        
+      </div>
+
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {pricingTiers.map((tier, index) => (
             <motion.div
@@ -1256,9 +1271,9 @@ const RegionalPricing = () => {
                       </svg>
                     </div>
                     <span className="text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
+                </li>
+              ))}
+            </ul>
               
               <button className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
                 tier.popular 
@@ -1268,8 +1283,8 @@ const RegionalPricing = () => {
                 {t('getStarted')}
               </button>
             </motion.div>
-          ))}
-        </div>
+        ))}
+      </div>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200/50">
           <h3 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-6 text-center">
@@ -1278,7 +1293,7 @@ const RegionalPricing = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {paymentMethods[region]?.map((method, index) => (
-              <motion.div
+            <motion.div
                 key={method.name}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -1299,9 +1314,9 @@ const RegionalPricing = () => {
                   <h4 className="text-lg font-bold text-gray-900 mb-2">{method.name}</h4>
                   <p className="text-gray-600 text-sm">{method.description}</p>
                 </div>
-              </motion.div>
+            </motion.div>
             ))}
-          </div>
+      </div>
           
           <div className="mt-8 text-center">
             <p className="text-gray-600 mb-4">{t('securePayments')}</p>
@@ -1344,7 +1359,7 @@ const Analytics = () => {
               <h3 className="font-bold text-emerald-800 text-lg">Follower Growth</h3>
               <p className="text-5xl font-bold text-emerald-600 mt-2">0</p>
               <p className="text-sm text-emerald-500 mt-1">Start growing your audience</p>
-            </div>
+      </div>
             <div className="p-6 bg-blue-50 rounded-2xl border border-blue-200">
               <h3 className="font-bold text-blue-800 text-lg">Engagement Rate</h3>
               <p className="text-5xl font-bold text-blue-600 mt-2">0%</p>
@@ -1358,7 +1373,7 @@ const Analytics = () => {
             <a href="/api/analytics/export/csv" download="analytics.csv" className="inline-block px-5 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-purple-600 transition-transform transform hover:scale-105">
               Download Sample Report
             </a>
-          </div>
+      </div>
         </div>
       </div>
     </div>
@@ -1431,14 +1446,14 @@ const AppLayout = ({ isDemoMode, onBackToHome, onShowModeSelection }) => {
         />
         
         <main className="flex-1">
-          <motion.div
+      <motion.div
             key={activeSection}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
             {renderContent()}
-          </motion.div>
+      </motion.div>
         </main>
       </div>
     </div>
@@ -1472,7 +1487,7 @@ const AppRouter = () => {
   }
 
   if (appMode === 'demo') {
-    return (
+  return (
       <AppLayout
         isDemoMode={true}
         onBackToHome={handleBackToHome}
@@ -1519,6 +1534,50 @@ const DataDeletionPage = () => {
   );
 };
 
+// Social Media Connect Wrapper Component
+const SocialConnectPage = () => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
+      <div className="container mx-auto py-8">
+        <SocialMediaConnect />
+        </div>
+        </div>
+  );
+};
+
+// Post Creator Wrapper Component
+const PostCreatorPage = () => {
+  const navigate = useNavigate();
+  
+  const handlePostCreated = (postData) => {
+    console.log('Post created:', postData);
+    // Could show success message or redirect
+    navigate('/analytics');
+  };
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
+      <div className="container mx-auto py-8">
+        <PostCreator onPostCreated={handlePostCreated} />
+      </div>
+    </div>
+  );
+};
+
+// Analytics Wrapper Component
+const AnalyticsPage = () => {
+  const location = useLocation();
+  const accountId = location.pathname.split('/')[2]; // Extract accountId from URL
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
+      <div className="container mx-auto py-8">
+        <Analytics accountId={accountId} />
+      </div>
+    </div>
+  );
+};
+
 // Main App Component with Router
 const App = () => {
   return (
@@ -1530,6 +1589,10 @@ const App = () => {
               <Route path="/privacy" element={<PrivacyPolicyPage />} />
               <Route path="/terms" element={<TermsOfServicePage />} />
               <Route path="/data-deletion" element={<DataDeletionPage />} />
+              <Route path="/connect-accounts" element={<SocialConnectPage />} />
+              <Route path="/create-post" element={<PostCreatorPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/analytics/:accountId" element={<AnalyticsPage />} />
               <Route path="/" element={<AppRouter />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

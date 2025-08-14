@@ -3,6 +3,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
+import metaRoutes from './routes/meta.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__dirname);
@@ -21,6 +22,7 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+app.use('/api/meta', metaRoutes);
 app.get('/api/ping', (req, res) => {
   res.json({ ok: true, timestamp: Date.now(), status: 'Backend running' });
 });

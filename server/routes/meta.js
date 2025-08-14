@@ -8,6 +8,54 @@ const META_APP_SECRET = process.env.META_APP_SECRET;
 const META_WEBHOOK_VERIFY_TOKEN = process.env.META_WEBHOOK_VERIFY_TOKEN || 'kizazi_webhook_token_2025';
 
 /**
+ * OAuth Login URL - Initiates Facebook/Instagram Authentication
+ * URL: https://kizazisocial.com/api/meta/oauth/login
+ */
+router.get('/oauth/login', (req, res) => {
+  try {
+    const { user_id } = req.query; // Optional: pass user ID for state tracking
+    
+    if (!META_APP_ID) {
+      return res.status(500).json({ error: 'Meta App ID not configured' });
+    }
+    
+    // Facebook OAuth URL with required permissions
+    const scopes = [
+      'email',
+      'public_profile',
+      'pages_show_list',
+      'pages_read_engagement',
+      'pages_manage_posts',
+      'instagram_basic',
+      'instagram_content_publish'
+    ].join(',');
+    
+    const state = user_id || crypto.randomBytes(16).toString('hex'); // CSRF protection
+    const redirectUri = `${process.env.BACKEND_URL}/api/meta/oauth/callback`;
+    
+    const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
+      `client_id=${META_APP_ID}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&scope=${encodeURIComponent(scopes)}` +
+      `&response_type=code` +
+      `&state=${state}`;
+    
+    console.log('Meta OAuth Login initiated:', {
+      user_id: user_id || 'anonymous',
+      state,
+      scopes
+    });
+    
+    // Redirect to Facebook OAuth
+    res.redirect(authUrl);
+    
+  } catch (error) {
+    console.error('Meta OAuth Login Error:', error);
+    res.status(500).json({ error: 'Failed to initiate OAuth login' });
+  }
+});
+
+/**
  * OAuth Callback URL for Facebook/Instagram Login
  * URL: https://kizazisocial.com/api/meta/oauth/callback
  */

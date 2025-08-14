@@ -149,7 +149,7 @@ const RegionSelection = () => {
         className="max-w-4xl w-full"
       >
         <div className="text-center mb-8">
-          <img src="/new-logo.svg" alt="KizaziSocial" className="w-20 h-20 mx-auto mb-4" />
+          <img src="/kizazi-logo.png" alt="KizaziSocial" className="w-20 h-20 mx-auto mb-4" />
           <h1 className="text-4xl font-bold text-white mb-2">{t('welcome')}</h1>
           <p className="text-pink-200 text-lg">{t('selectRegion')}</p>
         </div>
@@ -221,7 +221,7 @@ const ModeSelection = ({ onModeSelect }) => {
         className="max-w-4xl w-full"
       >
         <div className="text-center mb-8">
-          <img src="/new-logo.svg" alt="KizaziSocial" className="w-20 h-20 mx-auto mb-4" />
+          <img src="/kizazi-logo.png" alt="KizaziSocial" className="w-20 h-20 mx-auto mb-4" />
           <h1 className="text-4xl font-bold text-white mb-2">{t('chooseExperience')}</h1>
           <p className="text-pink-200 text-lg">How would you like to get started?</p>
         </div>
@@ -550,7 +550,7 @@ const ProtectedRoute = ({ children }) => {
       <>
         <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 flex items-center justify-center">
           <div className="text-white text-center">
-            <img src="/new-logo.svg" alt="KizaziSocial" className="w-20 h-20 mx-auto mb-4" />
+            <img src="/kizazi-logo.png" alt="KizaziSocial" className="w-20 h-20 mx-auto mb-4" />
             <h1 className="text-4xl font-bold mb-4">{t('welcome')}</h1>
             <p className="text-xl mb-8">Please log in to continue</p>
             <button
@@ -596,7 +596,7 @@ const Header = ({ onToggleSidebar, isDemoMode, onShowModeSelection }) => {
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-3">
-            <img src="/new-logo.svg" alt="KizaziSocial" className="w-10 h-10" />
+            <img src="/kizazi-logo.png" alt="KizaziSocial" className="w-10 h-10" />
             <h1 className="text-xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
               KizaziSocial
             </h1>
@@ -702,7 +702,7 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
         <div className="p-6">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
-              <img src="/new-logo.svg" alt="KIZAZI" className="w-8 h-8" />
+              <img src="/kizazi-logo.png" alt="KIZAZI" className="w-8 h-8" />
               <span className="text-white font-bold text-lg">KIZAZI</span>
             </div>
             <button

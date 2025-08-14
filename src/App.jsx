@@ -1341,8 +1341,8 @@ const RegionalPricing = () => {
   );
 };
 
-// Analytics Component
-const Analytics = () => {
+// Legacy Analytics Component (for old navigation)
+const LegacyAnalytics = () => {
   const { t } = useLanguage();
   
   return (
@@ -1419,7 +1419,7 @@ const AppLayout = ({ isDemoMode, onBackToHome, onShowModeSelection }) => {
       case 'dashboard': return <Dashboard />;
       case 'ai-content': return <AIContentGenerator />;
       case 'post-scheduler': return <PostScheduler />;
-      case 'analytics': return <Analytics />;
+      case 'analytics': return <LegacyAnalytics />;
       case 'pricing': return <RegionalPricing />;
       case 'support': return <Support />;
       default: return <Dashboard />;

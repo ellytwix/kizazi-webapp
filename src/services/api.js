@@ -23,6 +23,13 @@ class ApiService {
       },
       credentials: 'include',
     };
+    
+    console.log('🔧 Final request config:', {
+      url,
+      method: config.method || 'GET',
+      headers: config.headers,
+      hasBody: !!config.body
+    });
 
     // Add body if it's a string, otherwise stringify
     if (options.body && typeof options.body === 'object') {
@@ -110,10 +117,15 @@ class ApiService {
   async getSocialAccounts() {
     const token = localStorage.getItem('kizazi_token');
     console.log('🔑 Getting social accounts with token:', token ? 'Token present' : 'No token');
+    console.log('🔑 Token value:', token);
+    
+    const headers = {
+      'Authorization': token ? `Bearer ${token}` : ''
+    };
+    console.log('🔑 Headers being sent:', headers);
+    
     return this.request('/social/accounts', {
-      headers: {
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
+      headers
     });
   }
 

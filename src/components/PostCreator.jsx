@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Calendar, Image, Hash, Target, Sparkles, BarChart3 } from 'lucide-react';
+import api from '../services/api';
 
 const PostCreator = ({ onPostCreated }) => {
   const [connectedAccounts, setConnectedAccounts] = useState([]);
@@ -22,15 +23,11 @@ const PostCreator = ({ onPostCreated }) => {
 
   const loadConnectedAccounts = async () => {
     try {
-      const response = await fetch('/api/social/accounts', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('kizazi_token')}`
-        }
-      });
-      const data = await response.json();
+      const data = await api.getSocialAccounts();
       setConnectedAccounts(data.accounts || []);
     } catch (error) {
       console.error('Failed to load connected accounts:', error);
+      setConnectedAccounts([]);
     }
   };
 
@@ -39,18 +36,10 @@ const PostCreator = ({ onPostCreated }) => {
     
     setLoading(true);
     try {
-      const response = await fetch('/api/gemini/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('kizazi_token')}`
-        },
-        body: JSON.stringify({
-          prompt: `Improve this social media post and suggest relevant hashtags: "${formData.content}"`
-        })
-      });
+      const data = await api.generateContent(
+        `Improve this social media post and suggest relevant hashtags: "${formData.content}"`
+      );
       
-      const data = await response.json();
       if (data.text) {
         setFormData(prev => ({
           ...prev,
@@ -134,20 +123,8 @@ const PostCreator = ({ onPostCreated }) => {
         : null
     };
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(postData)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to post to ${account.platform}`);
-    }
-
-    return response.json();
+    const response = await api.postToSocial(endpoint, postData);
+    return response;
   };
 
   return (

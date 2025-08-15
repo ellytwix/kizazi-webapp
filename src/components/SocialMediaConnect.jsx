@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Instagram, Facebook, Plus, CheckCircle, AlertCircle, BarChart3 } from 'lucide-react';
+import api from '../services/api';
 
 const SocialMediaConnect = () => {
   const [connectedAccounts, setConnectedAccounts] = useState([]);
@@ -12,15 +13,11 @@ const SocialMediaConnect = () => {
 
   const loadConnectedAccounts = async () => {
     try {
-      const response = await fetch('/api/social/accounts', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('kizazi_token')}`
-        }
-      });
-      const data = await response.json();
+      const data = await api.getSocialAccounts();
       setConnectedAccounts(data.accounts || []);
     } catch (error) {
       console.error('Failed to load connected accounts:', error);
+      setConnectedAccounts([]);
     }
   };
 
@@ -32,12 +29,7 @@ const SocialMediaConnect = () => {
 
   const disconnectAccount = async (accountId) => {
     try {
-      await fetch(`/api/social/accounts/${accountId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('kizazi_token')}`
-        }
-      });
+      await api.disconnectSocialAccount(accountId);
       await loadConnectedAccounts();
     } catch (error) {
       console.error('Failed to disconnect account:', error);

@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }) => {
         // Store in localStorage
         localStorage.setItem('kizazi_user', JSON.stringify(response.user));
         localStorage.setItem('kizazi_token', response.token);
+        localStorage.setItem('userId', response.user.id || response.user._id || response.user.email);
         
         console.log('✅ Login successful, user stored');
         return response;
@@ -85,6 +86,7 @@ export const AuthProvider = ({ children }) => {
         // Store in localStorage
         localStorage.setItem('kizazi_user', JSON.stringify(response.user));
         localStorage.setItem('kizazi_token', response.token);
+        localStorage.setItem('userId', response.user.id || response.user._id || response.user.email);
         
         console.log('✅ Registration successful, user stored');
         return response;
@@ -106,6 +108,7 @@ export const AuthProvider = ({ children }) => {
     setError('');
     localStorage.removeItem('kizazi_user');
     localStorage.removeItem('kizazi_token');
+    localStorage.removeItem('userId');
     console.log('🔓 User logged out');
   };
 

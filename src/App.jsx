@@ -716,9 +716,9 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
             >
               <X size={20} />
             </button>
-              </div>
-            </div>
-        
+        </div>
+      </div>
+
         <nav className="px-4 space-y-2">
           {menuItems.map((item) => (
             <button
@@ -764,8 +764,8 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
               >
                 Privacy Policy
               </a>
-                  </div>
-              </div>
+          </div>
+      </div>
               </div>
       </aside>
     </>

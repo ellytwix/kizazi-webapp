@@ -105,6 +105,37 @@ class ApiService {
       body: { prompt }
     });
   }
+
+  // Social Media methods
+  async getSocialAccounts() {
+    const token = localStorage.getItem('kizazi_token');
+    return this.request('/social/accounts', {
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
+    });
+  }
+
+  async disconnectSocialAccount(accountId) {
+    const token = localStorage.getItem('kizazi_token');
+    return this.request(`/social/accounts/${accountId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
+    });
+  }
+
+  async postToSocial(endpoint, data) {
+    const token = localStorage.getItem('kizazi_token');
+    return this.request(endpoint, {
+      method: 'POST',
+      body: data,
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
+    });
+  }
 }
 
 const apiService = new ApiService();

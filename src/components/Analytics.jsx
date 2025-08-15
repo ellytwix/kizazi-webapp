@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, TrendingUp, Users, Eye, Heart, MessageCircle, Share, Calendar } from 'lucide-react';
+import api from '../services/api';
 
 const Analytics = ({ accountId }) => {
   const [analyticsData, setAnalyticsData] = useState(null);
@@ -21,12 +22,7 @@ const Analytics = ({ accountId }) => {
 
   const loadConnectedAccounts = async () => {
     try {
-      const response = await fetch('/api/social/accounts', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      const data = await api.getSocialAccounts();
       setConnectedAccounts(data.accounts || []);
       
       if (!selectedAccount && data.accounts.length > 0) {
@@ -34,6 +30,7 @@ const Analytics = ({ accountId }) => {
       }
     } catch (error) {
       console.error('Failed to load connected accounts:', error);
+      setConnectedAccounts([]);
     }
   };
 

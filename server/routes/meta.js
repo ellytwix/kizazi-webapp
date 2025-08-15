@@ -172,13 +172,19 @@ router.get('/oauth/callback', async (req, res) => {
       accounts: connectedAccounts.map(acc => ({ platform: acc.platform, name: acc.name }))
     });
     
-    // Redirect back to frontend with success and account data
-    const accountsParam = encodeURIComponent(JSON.stringify(connectedAccounts));
-    res.redirect(`${process.env.FRONTEND_URL}/connect-accounts?meta_connected=true&accounts=${accountsParam}`);
+    // Redirect back to frontend OAuth callback handler
+    const firstAccount = connectedAccounts[0];
+    const params = new URLSearchParams({
+      success: 'true',
+      platform: firstAccount?.platform || 'meta',
+      account_name: firstAccount?.name || 'Account',
+      accounts_count: connectedAccounts.length
+    });
+    res.redirect(`${process.env.FRONTEND_URL}/oauth/callback?${params}`);
     
   } catch (error) {
     console.error('Meta OAuth Callback Error:', error);
-    res.redirect(`${process.env.FRONTEND_URL}/?error=${encodeURIComponent('Failed to connect Meta account')}`);
+    res.redirect(`${process.env.FRONTEND_URL}/oauth/callback?success=false&error=${encodeURIComponent(error.message || 'Failed to connect Meta account')}`);
   }
 });
 

@@ -16,12 +16,12 @@ class ApiService {
     console.log('🔗 API Request:', options.method || 'GET', url);
     
     const config = {
+      ...options,
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
       credentials: 'include',
-      ...options,
     };
 
     // Add body if it's a string, otherwise stringify
@@ -109,6 +109,7 @@ class ApiService {
   // Social Media methods
   async getSocialAccounts() {
     const token = localStorage.getItem('kizazi_token');
+    console.log('🔑 Getting social accounts with token:', token ? 'Token present' : 'No token');
     return this.request('/social/accounts', {
       headers: {
         'Authorization': token ? `Bearer ${token}` : ''

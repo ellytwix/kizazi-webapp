@@ -12,6 +12,7 @@ import DataDeletion from './components/DataDeletion';
 import SocialMediaConnect from './components/SocialMediaConnect';
 import PostCreator from './components/PostCreator';
 import Analytics from './components/Analytics';
+import OAuthCallback from './components/OAuthCallback';
 
 // Backend Status Component
 const BackendStatus = () => {
@@ -1593,6 +1594,7 @@ const App = () => {
               <Route path="/create-post" element={<PostCreatorPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/analytics/:accountId" element={<AnalyticsPage />} />
+              <Route path="/oauth/callback" element={<OAuthCallback />} />
               <Route path="/" element={<AppRouter />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

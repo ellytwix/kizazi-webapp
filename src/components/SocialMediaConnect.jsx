@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Instagram, Facebook, Plus, CheckCircle, AlertCircle, BarChart3 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const SocialMediaConnect = () => {
+  const navigate = useNavigate();
   const [connectedAccounts, setConnectedAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -21,10 +23,12 @@ const SocialMediaConnect = () => {
     }
   };
 
-  const connectMetaAccount = () => {
+  const connectMetaAccount = (platform = 'facebook') => {
     setLoading(true);
     const userId = localStorage.getItem('userId');
-    window.location.href = `https://kizazisocial.com/api/meta/oauth/login?user_id=${userId}`;
+    // Both Facebook and Instagram use the same Meta OAuth flow
+    // The user will be able to select which accounts to connect during the OAuth process
+    window.location.href = `https://kizazisocial.com/api/meta/oauth/login?user_id=${userId}&platform=${platform}`;
   };
 
   const disconnectAccount = async (accountId) => {
@@ -81,7 +85,7 @@ const SocialMediaConnect = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => window.location.href = `/analytics/${account.id}`}
+                    onClick={() => navigate(`/analytics/${account.id}`)}
                     className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
                   >
                     <BarChart3 size={16} />
@@ -121,7 +125,7 @@ const SocialMediaConnect = () => {
               </div>
               
               <button
-                onClick={connectMetaAccount}
+                onClick={() => connectMetaAccount(platform.name.toLowerCase())}
                 disabled={loading}
                 className={`w-full bg-gradient-to-r ${platform.color} text-white py-3 px-4 rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-50`}
               >

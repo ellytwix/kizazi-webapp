@@ -14,7 +14,7 @@ const SocialMediaConnect = () => {
     try {
       const response = await fetch('/api/social/accounts', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('kizazi_token')}`
         }
       });
       const data = await response.json();
@@ -35,7 +35,7 @@ const SocialMediaConnect = () => {
       await fetch(`/api/social/accounts/${accountId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('kizazi_token')}`
         }
       });
       await loadConnectedAccounts();

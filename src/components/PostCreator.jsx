@@ -24,7 +24,7 @@ const PostCreator = ({ onPostCreated }) => {
     try {
       const response = await fetch('/api/social/accounts', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('kizazi_token')}`
         }
       });
       const data = await response.json();
@@ -43,7 +43,7 @@ const PostCreator = ({ onPostCreated }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('kizazi_token')}`
         },
         body: JSON.stringify({
           prompt: `Improve this social media post and suggest relevant hashtags: "${formData.content}"`

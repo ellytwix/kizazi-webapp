@@ -146,10 +146,46 @@ router.delete('/disconnect/:platform/:accountId', authenticate, async (req, res)
 // Get connected accounts
 router.get('/accounts', authenticate, async (req, res) => {
   try {
+    // For demo mode, return mock accounts if user doesn't have real ones
+    if (!req.user.socialAccounts || req.user.socialAccounts.length === 0) {
+      // Check if this is a demo user
+      if (req.user.email && req.user.email.includes('demo')) {
+        return res.json({
+          success: true,
+          accounts: [
+            {
+              id: 'fb_demo_1',
+              platform: 'Facebook',
+              name: 'Demo Business Page',
+              accountId: '123456789',
+              followers: 1542,
+              accessToken: 'demo_token_fb',
+              isActive: true,
+              connectedAt: new Date()
+            },
+            {
+              id: 'ig_demo_1', 
+              platform: 'Instagram',
+              name: '@demo_business',
+              accountId: '987654321',
+              followers: 3218,
+              accessToken: 'demo_token_ig',
+              isActive: true,
+              connectedAt: new Date()
+            }
+          ]
+        });
+      }
+    }
+
     const accounts = req.user.socialAccounts.map(account => ({
+      id: `${account.platform.toLowerCase()}_${account.accountId}`,
       platform: account.platform,
+      name: account.accountName,
       accountId: account.accountId,
       accountName: account.accountName,
+      followers: Math.floor(Math.random() * 5000) + 1000, // Mock follower count
+      accessToken: account.accessToken,
       isActive: account.isActive,
       connectedAt: account.connectedAt
     }));

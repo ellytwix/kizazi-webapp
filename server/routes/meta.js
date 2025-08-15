@@ -110,17 +110,71 @@ router.get('/oauth/callback', async (req, res) => {
     const pagesResponse = await fetch(`https://graph.facebook.com/v18.0/me/accounts?access_token=${longLivedData.access_token}`);
     const pagesData = await pagesResponse.json();
     
-    // Store the tokens securely (implement based on your user model)
-    // TODO: Save to database associated with user account
+    // Get user profile info
+    const userResponse = await fetch(`https://graph.facebook.com/v18.0/me?access_token=${longLivedData.access_token}`);
+    const userData = await userResponse.json();
     
-    console.log('Meta OAuth Success:', {
-      user_id: state, // if you passed user ID in state
-      pages_count: pagesData.data?.length || 0,
-      token_expires: longLivedData.expires_in
+    // Store connected accounts (simplified - in production, associate with logged-in user)
+    const connectedAccounts = [];
+    
+    // Add user's personal Facebook account
+    connectedAccounts.push({
+      id: `fb_${userData.id}`,
+      platform: 'Facebook',
+      accountId: userData.id,
+      name: userData.name,
+      accessToken: longLivedData.access_token,
+      followers: 0, // Would need additional API call
+      type: 'personal'
     });
     
-    // Redirect back to frontend with success
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard?meta_connected=true`);
+    // Add user's Facebook Pages
+    if (pagesData.data) {
+      for (const page of pagesData.data) {
+        connectedAccounts.push({
+          id: `fb_page_${page.id}`,
+          platform: 'Facebook',
+          accountId: page.id,
+          name: page.name,
+          accessToken: page.access_token,
+          followers: 0, // Would need additional API call
+          type: 'page'
+        });
+        
+        // Check for connected Instagram Business accounts
+        try {
+          const igResponse = await fetch(`https://graph.facebook.com/v18.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`);
+          const igData = await igResponse.json();
+          
+          if (igData.instagram_business_account) {
+            const igAccount = igData.instagram_business_account;
+            connectedAccounts.push({
+              id: `ig_${igAccount.id}`,
+              platform: 'Instagram',
+              accountId: igAccount.id,
+              name: `${page.name} (Instagram)`,
+              accessToken: page.access_token,
+              followers: 0, // Would need additional API call
+              type: 'business'
+            });
+          }
+        } catch (igError) {
+          console.log('No Instagram account for page:', page.name);
+        }
+      }
+    }
+    
+    // Store accounts in session/memory (in production, save to user database)
+    // For demo purposes, we'll store in a simple format that frontend can access
+    console.log('Meta OAuth Success:', {
+      user_id: state,
+      accounts_connected: connectedAccounts.length,
+      accounts: connectedAccounts.map(acc => ({ platform: acc.platform, name: acc.name }))
+    });
+    
+    // Redirect back to frontend with success and account data
+    const accountsParam = encodeURIComponent(JSON.stringify(connectedAccounts));
+    res.redirect(`${process.env.FRONTEND_URL}/connect-accounts?meta_connected=true&accounts=${accountsParam}`);
     
   } catch (error) {
     console.error('Meta OAuth Callback Error:', error);

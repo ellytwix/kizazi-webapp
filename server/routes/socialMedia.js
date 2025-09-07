@@ -149,7 +149,7 @@ router.get('/accounts', authenticate, async (req, res) => {
     // For demo mode, return mock accounts if user doesn't have real ones
     if (!req.user.socialAccounts || req.user.socialAccounts.length === 0) {
       // Check if this is a demo user
-      if (req.user.email && req.user.email.includes('demo')) {
+      if (req.user.email && (req.user.email.includes('demo') || req.user.type === 'demo')) {
         return res.json({
           success: true,
           accounts: [

@@ -12,42 +12,58 @@ export const authenticate = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
-    
-    if (!user) {
+    console.log('🔐 Auth middleware - token received:', token.substring(0, 20) + '...');
+
+    // Handle demo tokens (jwt-token-* format)
+    if (token.startsWith('jwt-token-') || token.startsWith('jwt-demo-') || token.startsWith('jwt-guest-')) {
+      console.log('🎭 Demo token detected, creating demo user');
+      
+      // Create a demo user for demo tokens
+      req.user = {
+        id: 'demo-user',
+        email: 'demo@kizazisocial.com',
+        name: 'Demo User',
+        type: 'demo',
+        isActive: true,
+        socialAccounts: [] // Will be handled in socialMedia route
+      };
+      
+      console.log('✅ Demo user authenticated');
+      return next();
+    }
+
+    // Handle real JWT tokens
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id).select('-password');
+      
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token is invalid - user not found'
+        });
+      }
+
+      if (!user.isActive) {
+        return res.status(401).json({
+          success: false,
+          message: 'Account is deactivated'
+        });
+      }
+
+      req.user = user;
+      next();
+    } catch (jwtError) {
+      console.error('JWT verification failed:', jwtError.message);
       return res.status(401).json({
         success: false,
-        message: 'Token is invalid - user not found'
+        message: 'Invalid token format'
       });
     }
 
-    if (!user.isActive) {
-      return res.status(401).json({
-        success: false,
-        message: 'Account is deactivated'
-      });
-    }
-
-    req.user = user;
-    next();
   } catch (error) {
     console.error('Auth middleware error:', error);
     
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Token has expired'
-      });
-    }
-    
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token'
-      });
-    }
-
     res.status(500).json({
       success: false,
       message: 'Authentication error'

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Send, Calendar, Image, Hash, Target, Sparkles, BarChart3 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Calendar, Image, Hash, Target, Sparkles, BarChart3, Video, Upload, X, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import api from '../services/api';
 
 const PostCreator = ({ onPostCreated }) => {
@@ -9,6 +9,7 @@ const PostCreator = ({ onPostCreated }) => {
     content: '',
     selectedAccounts: [],
     media: null,
+    mediaType: null, // 'image' or 'video'
     hashtags: '',
     scheduleDate: '',
     scheduleTime: '',
@@ -16,6 +17,10 @@ const PostCreator = ({ onPostCreated }) => {
   });
   const [loading, setLoading] = useState(false);
   const [posting, setPosting] = useState(false);
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     loadConnectedAccounts();
@@ -29,6 +34,81 @@ const PostCreator = ({ onPostCreated }) => {
       console.error('Failed to load connected accounts:', error);
       setConnectedAccounts([]);
     }
+  };
+
+  const handleMediaUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+    
+    if (!isImage && !isVideo) {
+      alert('Please select an image or video file');
+      return;
+    }
+
+    // Validate file size (10MB limit)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('File size must be less than 10MB');
+      return;
+    }
+
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    
+    setFormData(prev => ({
+      ...prev,
+      media: file,
+      mediaType: isImage ? 'image' : 'video'
+    }));
+    
+    setMediaPreview({
+      url: previewUrl,
+      type: isImage ? 'image' : 'video',
+      name: file.name,
+      size: file.size
+    });
+  };
+
+  const removeMedia = () => {
+    if (mediaPreview?.url) {
+      URL.revokeObjectURL(mediaPreview.url);
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      media: null,
+      mediaType: null
+    }));
+    
+    setMediaPreview(null);
+    setIsVideoPlaying(false);
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const toggleVideoPlay = () => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsVideoPlaying(!isVideoPlaying);
+    }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const generateAIContent = async () => {
@@ -90,10 +170,12 @@ const PostCreator = ({ onPostCreated }) => {
         });
         
         // Reset form
+        removeMedia();
         setFormData({
           content: '',
           selectedAccounts: [],
           media: null,
+          mediaType: null,
           hashtags: '',
           scheduleDate: '',
           scheduleTime: '',
@@ -160,6 +242,101 @@ const PostCreator = ({ onPostCreated }) => {
               )}
             </button>
           </div>
+        </div>
+
+        {/* Media Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <Image className="w-4 h-4 inline mr-1" />
+            Media (Optional)
+          </label>
+          
+          {!mediaPreview ? (
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleMediaUpload}
+                className="hidden"
+              />
+              <div className="space-y-4">
+                <div className="flex justify-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 px-4 py-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-100 transition"
+                  >
+                    <Image className="w-4 h-4" />
+                    Add Photo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition"
+                  >
+                    <Video className="w-4 h-4" />
+                    Add Video
+                  </button>
+                </div>
+                <p className="text-sm text-gray-500">
+                  Upload images or videos up to 10MB
+                </p>
+              </div>
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative bg-gray-50 rounded-lg overflow-hidden"
+            >
+              <button
+                type="button"
+                onClick={removeMedia}
+                className="absolute top-2 right-2 z-10 p-1 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              {mediaPreview.type === 'image' ? (
+                <div className="relative">
+                  <img
+                    src={mediaPreview.url}
+                    alt="Preview"
+                    className="w-full h-64 object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
+                    <p className="text-sm font-medium">{mediaPreview.name}</p>
+                    <p className="text-xs opacity-75">{formatFileSize(mediaPreview.size)}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <video
+                    ref={videoRef}
+                    src={mediaPreview.url}
+                    className="w-full h-64 object-cover"
+                    onPlay={() => setIsVideoPlaying(true)}
+                    onPause={() => setIsVideoPlaying(false)}
+                    onEnded={() => setIsVideoPlaying(false)}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={toggleVideoPlay}
+                      className="p-3 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition"
+                    >
+                      {isVideoPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                    </button>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
+                    <p className="text-sm font-medium">{mediaPreview.name}</p>
+                    <p className="text-xs opacity-75">{formatFileSize(mediaPreview.size)}</p>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
         </div>
 
         {/* Hashtags */}

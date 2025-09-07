@@ -12,6 +12,8 @@ import DataDeletion from './components/DataDeletion';
 import SocialMediaConnect from './components/SocialMediaConnect';
 import PostCreator from './components/PostCreator';
 import Analytics from './components/Analytics';
+import InstagramAnalytics from './components/InstagramAnalytics';
+import InteractiveCalendar from './components/InteractiveCalendar';
 import OAuthCallback from './components/OAuthCallback';
 
 // Backend Status Component
@@ -1031,12 +1033,14 @@ const AIContentGenerator = () => {
   );
 };
 
-// ENHANCED: Post Scheduler Component with Functional Post Creation
+// ENHANCED: Post Scheduler Component with Interactive Calendar
 const PostScheduler = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [showPostModal, setShowPostModal] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Demo data for demo users
   useEffect(() => {
@@ -1044,15 +1048,49 @@ const PostScheduler = () => {
     
     if (isDemoUser) {
       setPosts([
-        { id: 1, platform: 'Instagram', content: 'Beautiful sunset in Tanzania! 🌅', date: '2025-01-20', time: '10:00', status: 'scheduled' },
-        { id: 2, platform: 'Facebook', content: 'Exciting news about our expansion!', date: '2025-01-22', time: '14:30', status: 'draft' },
+        { id: 1, platform: 'Instagram', content: 'Beautiful sunset in Tanzania! 🌅', date: '2025-01-20', time: '10:00', status: 'scheduled', media: { type: 'image', url: '/api/placeholder/300/300' } },
+        { id: 2, platform: 'Facebook', content: 'Exciting news about our expansion!', date: '2025-01-22', time: '14:30', status: 'draft', media: { type: 'video', url: '/api/placeholder/300/300' } },
         { id: 3, platform: 'X', content: 'Technology transforming East Africa! #TechAfrica', date: '2025-01-25', time: '09:15', status: 'scheduled' }
       ]);
     }
   }, [user]);
 
   const handlePostCreated = (newPost) => {
-    setPosts(prev => [newPost, ...prev]);
+    const post = {
+      id: Date.now(),
+      platform: 'Multiple',
+      content: newPost.content,
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().split(' ')[0].substring(0, 5),
+      status: 'scheduled',
+      media: newPost.media
+    };
+    setPosts(prev => [post, ...prev]);
+  };
+
+  const handleDateClick = (date) => {
+    console.log('Date clicked:', date);
+    // You can add logic here to show posts for that date or create a new post
+  };
+
+  const handlePostClick = (post) => {
+    setSelectedPost(post);
+    setShowEditModal(true);
+  };
+
+  const handleEditPost = (post) => {
+    setSelectedPost(post);
+    setShowEditModal(true);
+  };
+
+  const handleDeletePost = (post) => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      setPosts(prev => prev.filter(p => p.id !== post.id));
+    }
+  };
+
+  const handleCreatePost = (date) => {
+    setShowPostModal(true);
   };
 
   const downloadCalendar = () => {
@@ -1098,7 +1136,7 @@ END:VCALENDAR`;
             <p className="text-gray-600 mt-1">{t('manageSchedule')}</p>
           </div>
           <div className="flex gap-3">
-                <button
+            <button
               onClick={downloadCalendar}
               className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-lg shadow hover:from-emerald-600 hover:to-teal-600 transition-all transform hover:scale-105"
             >
@@ -1110,53 +1148,68 @@ END:VCALENDAR`;
               className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-lg shadow hover:from-pink-600 hover:to-purple-600 transition-all transform hover:scale-105"
             >
               {t('newPost')}
-                </button>
-              </div>
+            </button>
+          </div>
         </div>
         
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200/50">
-          {posts.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">📅</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('noScheduled')}</h3>
-              <p className="text-gray-600 mb-6">{t('scheduleFirst')}</p>
-              <button 
-                onClick={() => setShowPostModal(true)}
-                className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-lg hover:from-pink-600 hover:to-purple-600 transition"
-              >
-                {t('scheduleFirstPost')}
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {posts.map(post => (
-                <div key={post.id} className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:shadow-lg transition-all hover:scale-105">
-                  <div className="flex items-start justify-between mb-2">
-                    <span className="font-bold text-gray-900">{post.platform}</span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      post.status === 'scheduled' ? 'bg-emerald-100 text-emerald-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {post.status}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700 mb-3 line-clamp-2">{post.content}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Calendar size={14} />
-                    <span>{post.date} @ {post.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-        )}
-      </div>
+        {/* Interactive Calendar */}
+        <InteractiveCalendar
+          posts={posts}
+          onDateClick={handleDateClick}
+          onPostClick={handlePostClick}
+          onCreatePost={handleCreatePost}
+          onEditPost={handleEditPost}
+          onDeletePost={handleDeletePost}
+        />
         
         <PostCreationModal
           isOpen={showPostModal}
           onClose={() => setShowPostModal(false)}
           onPostCreated={handlePostCreated}
         />
-        </div>
+
+        {/* Post Edit Modal */}
+        {showEditModal && selectedPost && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Edit Post</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                  <textarea
+                    value={selectedPost.content}
+                    onChange={(e) => setSelectedPost({...selectedPost, content: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setPosts(prev => prev.map(p => p.id === selectedPost.id ? selectedPost : p));
+                      setShowEditModal(false);
+                      setSelectedPost(null);
+                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition"
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowEditModal(false);
+                      setSelectedPost(null);
+                    }}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+    </div>
   );
 };
 
@@ -1573,7 +1626,7 @@ const AnalyticsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
       <div className="container mx-auto py-8">
-        <Analytics accountId={accountId} />
+        <InstagramAnalytics accountId={accountId} />
       </div>
     </div>
   );

@@ -10,8 +10,9 @@ export const authenticate = async (req, res, next) => {
     // For demo, we'll allow any token or even no token
     // In production, this should be replaced with proper JWT verification
     
-    if (!token || token.includes('demo') || token.includes('jwt-token-') || token.includes('guest')) {
-      // Create a demo user for all requests
+    // Determine user type based on token
+    if (!token) {
+      // No token - anonymous demo user
       req.user = {
         id: 'demo-user-123',
         email: 'demo@kizazisocial.com', 
@@ -21,11 +22,41 @@ export const authenticate = async (req, res, next) => {
         socialAccounts: []
       };
       
-      console.log('✅ Demo authentication successful');
+      console.log('✅ Anonymous demo authentication');
       return next();
     }
     
-    // For any other token, still create a demo user
+    if (token.includes('demo') || token.includes('jwt-demo-')) {
+      // Explicit demo token
+      req.user = {
+        id: 'demo-user-123',
+        email: 'demo@kizazisocial.com', 
+        name: 'Demo User',
+        type: 'demo',
+        isActive: true,
+        socialAccounts: []
+      };
+      
+      console.log('✅ Demo user authentication');
+      return next();
+    }
+    
+    if (token.includes('jwt-token-') || token.includes('guest')) {
+      // Regular user token
+      req.user = {
+        id: 'user-' + Date.now(),
+        email: 'user@kizazisocial.com',
+        name: 'Kizazi User',
+        type: 'user',
+        isActive: true,
+        socialAccounts: [] // Real users start with no connected accounts
+      };
+      
+      console.log('✅ Real user authentication');
+      return next();
+    }
+    
+    // Fallback - treat as real user
     req.user = {
       id: 'user-' + Date.now(),
       email: 'user@kizazisocial.com',

@@ -139,20 +139,32 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, mode } = req.body;
   
-  // Check demo account
+  console.log('🔐 Login attempt:', { email, mode });
+  
+  // Check if this is demo mode
+  if (mode === 'demo') {
+    res.json({ 
+      message: 'Demo login successful',
+      user: { id: 'demo-user', name: 'Demo User', email: 'demo@kizazisocial.com', type: 'demo' },
+      token: 'jwt-demo-' + Date.now()
+    });
+    return;
+  }
+  
+  // Check demo account (treat as real user)
   if (email === 'eliyatwisa@gmail.com' && password === '12345678') {
     res.json({ 
       message: 'Login successful',
-      user: { id: 1, name: 'Elly Twix', email },
+      user: { id: 1, name: 'Elly Twix', email, type: 'user' },
       token: 'jwt-token-' + Date.now()
     });
   } else if (email && password) {
-    // Allow any valid email/password for demo
+    // Allow any valid email/password for real users
     res.json({ 
       message: 'Login successful',
-      user: { id: Date.now(), name: 'Demo User', email },
+      user: { id: Date.now(), name: email.split('@')[0], email, type: 'user' },
       token: 'jwt-token-' + Date.now()
     });
   } else {

@@ -1,6 +1,8 @@
 import express from 'express';
 import axios from 'axios';
-import { authenticate } from '../middleware/auth.js';
+// Temporarily use demo auth for development
+// import { authenticate } from '../middleware/auth.js';
+import { authenticate } from '../middleware/authDemo.js';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
 

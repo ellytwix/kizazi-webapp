@@ -262,8 +262,8 @@ const ModeSelection = ({ onModeSelect }) => {
   );
 };
 
-// NEW: Post Creation Modal
-const PostCreationModal = ({ isOpen, onClose, onPostCreated }) => {
+// REMOVED: Old PostCreationModal - now using enhanced PostCreator component
+const RemovedPostCreationModal = ({ isOpen, onClose, onPostCreated }) => {
   const { t } = useLanguage();
   const [formData, setFormData] = useState({
     content: '',
@@ -1162,11 +1162,25 @@ END:VCALENDAR`;
           onDeletePost={handleDeletePost}
         />
         
-        <PostCreationModal
-          isOpen={showPostModal}
-          onClose={() => setShowPostModal(false)}
-          onPostCreated={handlePostCreated}
-        />
+        {showPostModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-900">Create New Post</h2>
+                <button
+                  onClick={() => setShowPostModal(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              <PostCreator onPostCreated={(post) => {
+                handlePostCreated(post);
+                setShowPostModal(false);
+              }} />
+            </div>
+          </div>
+        )}
 
         {/* Post Edit Modal */}
         {showEditModal && selectedPost && (

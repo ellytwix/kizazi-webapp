@@ -14,4 +14,24 @@ export default defineConfig({
       ],
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate vendor libraries
+          vendor: ['react', 'react-dom'],
+          // Animation library
+          motion: ['framer-motion'],
+          // Icons
+          icons: ['lucide-react'],
+          // Router
+          router: ['react-router-dom'],
+          // Charts and visualizations (if any)
+          charts: []
+        }
+      }
+    },
+    // Increase chunk size warning limit to 1MB
+    chunkSizeWarningLimit: 1000
+  }
 })

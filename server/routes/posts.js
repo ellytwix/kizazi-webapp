@@ -1,6 +1,14 @@
 import express from 'express';
 import Post from '../models/Post.js';
-import { authenticate, verifyPlan } from '../middleware/auth.js';
+// Temporarily use demo auth for development
+// import { authenticate, verifyPlan } from '../middleware/auth.js';
+import { authenticate } from '../middleware/authDemo.js';
+
+// Mock verifyPlan for demo
+const verifyPlan = (req, res, next) => {
+  req.user.plan = 'pro'; // Give everyone pro access for demo
+  next();
+};
 
 const router = express.Router();
 

@@ -1,6 +1,8 @@
 import express from 'express';
 import Post from '../models/Post.js';
-import { authenticate } from '../middleware/auth.js';
+// Temporarily use demo auth for development
+// import { authenticate } from '../middleware/auth.js';
+import { authenticate } from '../middleware/authDemo.js';
 
 const router = express.Router();
 

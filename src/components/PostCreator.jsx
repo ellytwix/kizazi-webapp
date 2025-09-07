@@ -34,6 +34,11 @@ const PostCreator = ({ onPostCreated }) => {
       setConnectedAccounts(data.accounts || []);
     } catch (error) {
       console.error('Failed to load connected accounts:', error);
+      if (error.status === 401) {
+        console.log('🚨 Authentication failed - user needs to login again');
+        // Don't retry on 401 - user needs to login again
+        return;
+      }
       setConnectedAccounts([]);
     }
   };

@@ -20,6 +20,12 @@ const SocialMediaConnect = () => {
       setConnectedAccounts(data.accounts || []);
     } catch (error) {
       console.error('Failed to load connected accounts:', error);
+      if (error.status === 401) {
+        console.log('🚨 Authentication failed in SocialMediaConnect - user needs to login again');
+        // Don't retry on 401 - show message instead
+        setConnectedAccounts([]);
+        return;
+      }
       setConnectedAccounts([]);
     }
   };

@@ -213,8 +213,9 @@ const PostCreator = ({ onPostCreated }) => {
     return response;
   };
 
+  console.log('📋 Rendering PostCreator UI...');
+  
   try {
-    console.log('📋 Rendering PostCreator UI...');
     return (
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Create New Post</h2>

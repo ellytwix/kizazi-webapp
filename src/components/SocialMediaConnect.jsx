@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Instagram, Facebook, Plus, CheckCircle, AlertCircle, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import META_CONFIG from '../config/meta';
 
 const SocialMediaConnect = () => {
   const navigate = useNavigate();
@@ -26,9 +27,13 @@ const SocialMediaConnect = () => {
   const connectMetaAccount = (platform = 'facebook') => {
     setLoading(true);
     const userId = localStorage.getItem('userId');
+    
+    // Use configuration for API URL
+    const apiUrl = META_CONFIG.API_BASE_URL;
+    
     // Both Facebook and Instagram use the same Meta OAuth flow
     // The user will be able to select which accounts to connect during the OAuth process
-    window.location.href = `https://kizazisocial.com/api/meta/oauth/login?user_id=${userId}&platform=${platform}`;
+    window.location.href = `${apiUrl}/meta/oauth/login?user_id=${userId}&platform=${platform}`;
   };
 
   const disconnectAccount = async (accountId) => {

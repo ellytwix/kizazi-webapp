@@ -4,6 +4,8 @@ import { Send, Calendar, Image, Hash, Target, Sparkles, BarChart3, Video, Upload
 import api from '../services/api';
 
 const PostCreator = ({ onPostCreated }) => {
+  console.log('🎯 PostCreator component rendering...', { onPostCreated });
+  
   const [connectedAccounts, setConnectedAccounts] = useState([]);
   const [formData, setFormData] = useState({
     content: '',
@@ -37,8 +39,10 @@ const PostCreator = ({ onPostCreated }) => {
   };
 
   const handleMediaUpload = (event) => {
+    console.log('📁 handleMediaUpload called', event);
     const file = event.target.files[0];
     if (!file) return;
+    console.log('📁 File selected:', file.name, file.type, file.size);
 
     // Validate file type
     const isImage = file.type.startsWith('image/');
@@ -209,9 +213,11 @@ const PostCreator = ({ onPostCreated }) => {
     return response;
   };
 
-  return (
-    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Create New Post</h2>
+  try {
+    console.log('📋 Rendering PostCreator UI...');
+    return (
+      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Create New Post</h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Content Input */}
@@ -264,7 +270,10 @@ const PostCreator = ({ onPostCreated }) => {
                 <div className="flex justify-center gap-4">
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => {
+                      console.log('📸 Add Photo button clicked', fileInputRef.current);
+                      fileInputRef.current?.click();
+                    }}
                     className="flex items-center gap-2 px-4 py-2 bg-pink-50 text-pink-600 rounded-lg hover:bg-pink-100 transition"
                   >
                     <Image className="w-4 h-4" />
@@ -272,7 +281,10 @@ const PostCreator = ({ onPostCreated }) => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => {
+                      console.log('🎥 Add Video button clicked', fileInputRef.current);
+                      fileInputRef.current?.click();
+                    }}
                     className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition"
                   >
                     <Video className="w-4 h-4" />
@@ -474,6 +486,19 @@ const PostCreator = ({ onPostCreated }) => {
       </form>
     </div>
   );
+  } catch (error) {
+    console.error('❌ PostCreator component error:', error);
+    return (
+      <div className="max-w-2xl mx-auto bg-red-50 border border-red-200 rounded-xl p-6">
+        <h2 className="text-xl font-bold text-red-700 mb-4">Component Error</h2>
+        <p className="text-red-600">PostCreator failed to render: {error.message}</p>
+        <details className="mt-4">
+          <summary className="cursor-pointer text-red-500">Error Details</summary>
+          <pre className="text-xs text-red-400 mt-2 overflow-auto">{error.stack}</pre>
+        </details>
+      </div>
+    );
+  }
 };
 
 export default PostCreator;

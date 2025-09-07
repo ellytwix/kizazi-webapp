@@ -168,24 +168,3 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log('🤖 Gemini AI: Real API integration enabled');
 });
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    message: 'KIZAZI Backend is running!',
-    timestamp: new Date().toISOString(),
-    database: {
-      status: 'healthy',
-      database: 'test',
-      host: 'ac-q4ztjpw-shard-00-00.bsqw4lj.mongodb.net',
-      port: 27017,
-      readyState: 1,
-      readyStateText: 'connected'
-    },
-    services: {
-      scheduler: 'running',
-      api: 'healthy'
-    }
-  });
-});

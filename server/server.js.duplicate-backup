@@ -28,7 +28,49 @@ app.use('/api/meta', metaRoutes);
 app.use('/api/social', socialMediaRoutes);
 app.use('/api/auth', authRoutes);
 app.get('/api/ping', (req, res) => {
+
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "KIZAZI Backend is running!",
+    timestamp: new Date().toISOString(),
+    database: {
+      status: "healthy",
+      database: "test",
+      host: "ac-q4ztjpw-shard-00-00.bsqw4lj.mongodb.net",
+      port: 27017,
+      readyState: 1,
+      readyStateText: "connected"
+    },
+    services: {
+      scheduler: "running",
+      api: "healthy"
+    }
+  });
+});
   res.json({ ok: true, timestamp: Date.now(), status: 'Backend running' });
+
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "KIZAZI Backend is running!",
+    timestamp: new Date().toISOString(),
+    database: {
+      status: "healthy",
+      database: "test",
+      host: "ac-q4ztjpw-shard-00-00.bsqw4lj.mongodb.net",
+      port: 27017,
+      readyState: 1,
+      readyStateText: "connected"
+    },
+    services: {
+      scheduler: "running",
+      api: "healthy"
+    }
+  });
+});
 });
 
 // Mock social accounts endpoint for testing (replace with real database later)
@@ -167,25 +209,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log('🤖 Gemini AI: Real API integration enabled');
-});
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    message: 'KIZAZI Backend is running!',
-    timestamp: new Date().toISOString(),
-    database: {
-      status: 'healthy',
-      database: 'test',
-      host: 'ac-q4ztjpw-shard-00-00.bsqw4lj.mongodb.net',
-      port: 27017,
-      readyState: 1,
-      readyStateText: 'connected'
-    },
-    services: {
-      scheduler: 'running',
-      api: 'healthy'
-    }
-  });
 });

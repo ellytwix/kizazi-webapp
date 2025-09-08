@@ -1232,22 +1232,48 @@ const RegionalPricing = () => {
   const { region, currency } = useRegion();
   const { t } = useLanguage();
   
+  // Currency conversion rates from TZS
+  const conversionRates = {
+    'Tanzania': 1,      // Base currency (TZS)
+    'Kenya': 0.6,       // 1 TZS = 0.6 KES
+    'Uganda': 1.5,      // 1 TZS = 1.5 UGX
+    'Rwanda': 0.5,      // 1 TZS = 0.5 RWF
+    'default': 1
+  };
+
+  const getRegionalPrice = (tzsPriceInThousands) => {
+    const rate = conversionRates[region] || conversionRates['default'];
+    return Math.round(tzsPriceInThousands * rate);
+  };
+
   const pricingTiers = [
     {
-      name: 'Starter',
-      price: region === 'Kenya' ? 6000 : 10000,
-      features: ['5 Social Accounts', '50 Posts/Month', 'Basic Analytics', 'Email Support']
+      name: 'Free Trial',
+      price: 0,
+      duration: '14 days',
+      features: ['1 account', '3 posts a week', 'Basic analytics'],
+      trial: true
     },
     {
-      name: 'Professional', 
-      price: region === 'Kenya' ? 30000 : 50000,
-      features: ['15 Social Accounts', '200 Posts/Month', 'Advanced Analytics', 'AI Content', 'Priority Support'],
+      name: 'Basic',
+      price: getRegionalPrice(10), // 10k TZS base
+      features: ['1 account', '3 posts a week', 'Basic analytics']
+    },
+    {
+      name: 'Standard', 
+      price: getRegionalPrice(20), // 20k TZS base
+      features: ['3 accounts', '4 posts per week', 'Intermediate analytics'],
       popular: true
     },
     {
+      name: 'Professional',
+      price: getRegionalPrice(50), // 50k TZS base
+      features: ['Up to 7 accounts', 'Unlimited posting', 'Advanced analytics']
+    },
+    {
       name: 'Enterprise',
-      price: region === 'Kenya' ? 60000 : 100000,
-      features: ['Unlimited Accounts', 'Unlimited Posts', 'Custom Analytics', 'API Access', '24/7 Support']
+      price: getRegionalPrice(100), // 100k TZS base
+      features: ['Up to 15 accounts', 'Unlimited posting', 'Advanced analytics', 'Team features (Multiple access)']
     }
   ];
 
@@ -1290,6 +1316,38 @@ const RegionalPricing = () => {
         bgColor: 'bg-yellow-50',
         borderColor: 'border-yellow-200'
       }
+    ],
+    Uganda: [
+      { 
+        name: 'MTN Mobile Money', 
+        image: '/payment-icons/mtn.svg', 
+        description: 'MTN Uganda',
+        bgColor: 'bg-yellow-50',
+        borderColor: 'border-yellow-200'
+      },
+      { 
+        name: 'Airtel Money', 
+        image: '/payment-icons/airtel.svg', 
+        description: 'Airtel Uganda',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200'
+      }
+    ],
+    Rwanda: [
+      { 
+        name: 'MTN Mobile Money', 
+        image: '/payment-icons/mtn.svg', 
+        description: 'MTN Rwanda',
+        bgColor: 'bg-yellow-50',
+        borderColor: 'border-yellow-200'
+      },
+      { 
+        name: 'Airtel Money', 
+        image: '/payment-icons/airtel.svg', 
+        description: 'Airtel Rwanda',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200'
+      }
     ]
   };
 
@@ -1325,9 +1383,11 @@ const RegionalPricing = () => {
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{tier.name}</h3>
                 <div className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-                  {currency} {tier.price.toLocaleString()}
+                  {tier.trial ? 'Free' : `${currency} ${(tier.price * 1000).toLocaleString()}`}
                 </div>
-                <div className="text-gray-600 text-sm">/month</div>
+                <div className="text-gray-600 text-sm">
+                  {tier.trial ? tier.duration : '/month'}
+                </div>
               </div>
               
               <ul className="space-y-3 mb-8">

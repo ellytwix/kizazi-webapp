@@ -239,6 +239,11 @@ const PostCreator = ({ onPostCreated }) => {
   };
 
   console.log('📋 Rendering PostCreator UI...');
+  console.log('🔧 Debug: PostCreator state:', { 
+    connectedAccounts: connectedAccounts.length, 
+    mediaPreview: !!mediaPreview,
+    formData: formData 
+  });
   
   try {
     return (
@@ -282,6 +287,12 @@ const PostCreator = ({ onPostCreated }) => {
             <Image className="w-4 h-4 inline mr-1" />
             Media (Optional)
           </label>
+          {console.log('🎨 MEDIA UPLOAD SECTION RENDERING!')}
+          
+          {/* DEBUG: Always visible indicator */}
+          <div className="mb-2 p-2 bg-blue-50 text-blue-700 text-xs rounded">
+            ✅ Media upload section loaded! Buttons below:
+          </div>
           
           {!mediaPreview ? (
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">

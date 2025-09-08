@@ -56,34 +56,29 @@ class ApiService {
       console.log('📦 Response data:', data);
 
       if (!response.ok) {
-        const error = new Error(data.error || data.message || `HTTP ${response.status}`);
-        error.status = response.status;
-        error.data = data;
-        throw error;
+        const err = new Error(data?.error || data?.message || `HTTP ${response.status}`);
+        err.status = response.status;
+        err.data = data;
+        throw err;
       }
 
       return data;
     } catch (error) {
       console.error('❌ API Error:', error);
       
-      // Provide user-friendly error messages
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        throw new Error('Unable to connect to server. Please check your connection.');
+      // Preserve HTTP status errors so callers can branch on error.status
+      if (typeof error.status === 'number') {
+        throw error;
       }
       
-      if (error.status === 401) {
-        throw new Error('Invalid email or password');
+      // Provide user-friendly network error messages
+      if (error.name === 'TypeError' && String(error.message).includes('fetch')) {
+        const netErr = new Error('Unable to connect to server. Please check your connection.');
+        netErr.status = 0;
+        throw netErr;
       }
       
-      if (error.status === 400) {
-        throw new Error(error.data?.error || 'Invalid request data');
-      }
-      
-      if (error.status === 500) {
-        throw new Error('Server error. Please try again.');
-      }
-      
-      throw new Error(error.message || 'Network error occurred');
+      throw error;
     }
   }
 

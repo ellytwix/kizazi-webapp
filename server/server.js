@@ -31,23 +31,7 @@ app.get('/api/ping', (req, res) => {
   res.json({ ok: true, timestamp: Date.now(), status: 'Backend running' });
 });
 
-// Mock social accounts endpoint for testing (replace with real database later)
-let mockConnectedAccounts = [];
-
-app.get('/api/social/accounts', (req, res) => {
-  // For testing, return mock data if no real accounts connected
-  if (mockConnectedAccounts.length === 0) {
-    return res.json({ accounts: [] });
-  }
-  
-  res.json({ accounts: mockConnectedAccounts });
-});
-
-app.post('/api/social/mock-connect', (req, res) => {
-  const { accounts } = req.body;
-  mockConnectedAccounts = accounts || [];
-  res.json({ success: true, message: 'Mock accounts connected' });
-});
+// Note: social accounts are served exclusively via routes in routes/socialMedia.js
 
 app.get('/api/analytics/export/csv', (req, res) => {
   const csvData = `Date,Platform,Posts,Engagement

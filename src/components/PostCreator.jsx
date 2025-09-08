@@ -253,11 +253,13 @@ const PostCreator = ({ onPostCreated }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Content Input */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="postContent" className="block text-sm font-medium text-gray-700 mb-2">
             Post Content
           </label>
           <div className="relative">
             <textarea
+              id="postContent"
+              name="content"
               value={formData.content}
               onChange={(e) => setFormData({...formData, content: e.target.value})}
               placeholder="What's on your mind?"
@@ -283,7 +285,7 @@ const PostCreator = ({ onPostCreated }) => {
 
         {/* Media Upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="mediaInput" className="block text-sm font-medium text-gray-700 mb-2">
             <Image className="w-4 h-4 inline mr-1" />
             Media (Optional)
           </label>
@@ -297,6 +299,8 @@ const PostCreator = ({ onPostCreated }) => {
           {!mediaPreview ? (
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
               <input
+                id="mediaInput"
+                name="media"
                 ref={fileInputRef}
                 type="file"
                 accept="image/*,video/*"
@@ -483,6 +487,8 @@ const PostCreator = ({ onPostCreated }) => {
             {formData.publishType === 'schedule' && (
               <div className="flex gap-3 ml-6">
                 <input
+                  id="scheduleDate"
+                  name="scheduleDate"
                   type="date"
                   value={formData.scheduleDate}
                   onChange={(e) => setFormData({...formData, scheduleDate: e.target.value})}
@@ -490,6 +496,8 @@ const PostCreator = ({ onPostCreated }) => {
                   required={formData.publishType === 'schedule'}
                 />
                 <input
+                  id="scheduleTime"
+                  name="scheduleTime"
                   type="time"
                   value={formData.scheduleTime}
                   onChange={(e) => setFormData({...formData, scheduleTime: e.target.value})}

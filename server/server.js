@@ -77,24 +77,52 @@ app.post('/api/gemini/generate', async (req, res) => {
     );
 
     const data = await response.json();
-    
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      const generatedText = data.candidates[0].content.parts[0].text;
+
+    // Handle common error shapes from Gemini
+    if (!response.ok) {
+      const message = data?.error?.message || data?.error || `HTTP ${response.status}`;
+      console.error('❌ Gemini API HTTP error:', message);
+      return res.status(response.status).json({ error: message });
+    }
+
+    // Extract text from various Gemini response shapes
+    const extractText = (payload) => {
+      try {
+        if (!payload) return '';
+        if (payload.candidates && payload.candidates.length > 0) {
+          const candidate = payload.candidates[0];
+          // Newer SDK-style: candidate.content.parts[].text
+          if (candidate.content && Array.isArray(candidate.content.parts)) {
+            const partWithText = candidate.content.parts.find(p => typeof p.text === 'string');
+            if (partWithText?.text) return partWithText.text;
+          }
+          // Alt shape: candidate.output_text
+          if (typeof candidate.output_text === 'string') return candidate.output_text;
+        }
+        // Alt shape: promptFeedback / safety, no text
+        return '';
+      } catch (_) {
+        return '';
+      }
+    };
+
+    const generatedText = extractText(data);
+
+    if (generatedText) {
       console.log('✅ Gemini API success');
-      
-      res.json({ 
+      return res.json({ 
         text: generatedText,
         prompt,
         timestamp: new Date().toISOString(),
         source: 'gemini-1.5-flash'
       });
-    } else {
-      console.error('❌ Unexpected Gemini API response:', data);
-      res.status(500).json({ 
-        error: 'AI generation failed',
-        details: data.error || 'Unexpected response format'
-      });
     }
+
+    console.error('❌ Unexpected Gemini API response shape:', data);
+    return res.status(502).json({ 
+      error: 'AI generation failed',
+      details: data?.error || 'Unexpected response format'
+    });
 
   } catch (error) {
     console.error('❌ Gemini API error:', error);

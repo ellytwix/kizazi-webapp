@@ -685,7 +685,6 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
     { id: 'dashboard', label: t('dashboard'), icon: BarChart3 },
     { id: 'connect-accounts', label: 'Connect Accounts', icon: Settings, isNew: true },
     { id: 'create-post', label: 'Create Post', icon: Upload, isNew: true },
-    { id: 'ai-content', label: t('aiContent'), icon: Upload },
     { id: 'post-scheduler', label: t('postScheduler'), icon: Calendar },
     { id: 'analytics', label: t('analytics'), icon: BarChart3 },
     { id: 'pricing', label: t('pricing'), icon: DollarSign },
@@ -1545,7 +1544,6 @@ const AppLayout = ({ isDemoMode, onBackToHome, onShowModeSelection }) => {
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard': return <Dashboard />;
-      case 'ai-content': return <AIContentGenerator />;
       case 'post-scheduler': return <PostScheduler />;
       case 'analytics': return <LegacyAnalytics />;
       case 'pricing': return <RegionalPricing />;

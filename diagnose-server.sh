@@ -40,16 +40,16 @@ fi
 # 5. Check deployed files
 echo ""
 echo "🌐 5. Deployed files check:"
-if [ -d "/var/www/html/kizazi-webapp" ]; then
-    echo "✅ Web root exists"
+if [ -d "/var/www/html" ]; then
+    echo "✅ Web root exists: /var/www/html"
     echo "Latest files in web root:"
-    ls -lt /var/www/html/kizazi-webapp/assets/ | head -5
+    ls -lt /var/www/html/assets/ | head -5
     
     # Check if PostCreator code is in bundle
     echo ""
     echo "Checking for PostCreator code:"
-    grep -l "Add Photo" /var/www/html/kizazi-webapp/assets/*.js 2>/dev/null || echo "❌ 'Add Photo' not found in deployed JS"
-    grep -l "handleMediaUpload" /var/www/html/kizazi-webapp/assets/*.js 2>/dev/null || echo "❌ 'handleMediaUpload' not found in deployed JS"
+    grep -l "Add Photo" /var/www/html/assets/*.js 2>/dev/null || echo "❌ 'Add Photo' not found in deployed JS"
+    grep -l "handleMediaUpload" /var/www/html/assets/*.js 2>/dev/null || echo "❌ 'handleMediaUpload' not found in deployed JS"
 else
     echo "❌ Web root NOT found!"
 fi
@@ -57,8 +57,8 @@ fi
 # 6. Compare source vs deployed
 echo ""
 echo "🔄 6. Source vs Deployed comparison:"
-if [ -f "dist/index.html" ] && [ -f "/var/www/html/kizazi-webapp/index.html" ]; then
-    diff -q dist/index.html /var/www/html/kizazi-webapp/index.html || echo "⚠️  index.html files differ!"
+if [ -f "dist/index.html" ] && [ -f "/var/www/html/index.html" ]; then
+    diff -q dist/index.html /var/www/html/index.html || echo "⚠️  index.html files differ!"
 else
     echo "❌ Cannot compare - missing files"
 fi

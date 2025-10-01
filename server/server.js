@@ -58,9 +58,10 @@ app.post('/api/gemini/generate', async (req, res) => {
 
     console.log('🤖 Calling real Gemini API with prompt:', prompt.substring(0, 50) + '...');
 
-    // Call the real Gemini API
+    // Call the real Gemini API (model configurable via env)
+    const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: {
@@ -114,7 +115,7 @@ app.post('/api/gemini/generate', async (req, res) => {
         text: generatedText,
         prompt,
         timestamp: new Date().toISOString(),
-        source: 'gemini-1.5-flash'
+        source: MODEL
       });
     }
 

@@ -28,13 +28,15 @@ echo "🔨 3. Building frontend..."
 npm run build
 
 # Step 4: Clear old deployment and sync new build
-echo "🔄 4. Deploying to web root..."
+echo "🔄 4. Deploying to web root (/var/www/html)..."
+# Ensure web root exists
+sudo mkdir -p /var/www/html
 # Remove old files completely
-sudo rm -rf /var/www/html/kizazi-webapp/*
+sudo rm -rf /var/www/html/*
 # Copy new build
-sudo cp -r dist/* /var/www/html/kizazi-webapp/
+sudo cp -r dist/* /var/www/html/
 # Set proper permissions
-sudo chown -R www-data:www-data /var/www/html/kizazi-webapp/
+sudo chown -R www-data:www-data /var/www/html/
 
 # Step 5: Restart backend
 echo "🔄 5. Restarting backend server..."
@@ -49,7 +51,7 @@ sudo nginx -t && sudo systemctl reload nginx
 # Step 7: Verify deployment
 echo "✅ 7. Verifying deployment..."
 echo "Checking for PostCreator in bundle..."
-grep -q "Add Photo" /var/www/html/kizazi-webapp/assets/*.js && echo "✅ Media upload buttons found" || echo "❌ Media upload buttons NOT found"
+grep -q "Add Photo" /var/www/html/assets/*.js && echo "✅ Media upload buttons found" || echo "❌ Media upload buttons NOT found"
 
 echo "Checking backend health..."
 curl -s https://www.kizazisocial.com/api/health | jq '.' || echo "❌ Backend health check failed"

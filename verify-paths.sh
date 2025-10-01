@@ -9,22 +9,22 @@ echo "📂 Checking deployment paths:"
 echo ""
 
 # Path 1: Original location
-echo "1. /var/www/html/kizazi-webapp/"
-if [ -d "/var/www/html/kizazi-webapp" ]; then
+echo "1. /var/www/html/"
+if [ -d "/var/www/html" ]; then
     echo "   ✅ EXISTS"
-    echo "   Last modified: $(stat -c %y /var/www/html/kizazi-webapp/index.html 2>/dev/null || echo 'No index.html')"
-    echo "   Asset count: $(ls /var/www/html/kizazi-webapp/assets/*.js 2>/dev/null | wc -l) JS files"
+    echo "   Last modified: $(stat -c %y /var/www/html/index.html 2>/dev/null || echo 'No index.html')"
+    echo "   Asset count: $(ls /var/www/html/assets/*.js 2>/dev/null | wc -l) JS files"
 else
     echo "   ❌ NOT FOUND"
 fi
 
 # Path 2: Possible dist subfolder
 echo ""
-echo "2. /var/www/html/kizazi-webapp/dist/"
-if [ -d "/var/www/html/kizazi-webapp/dist" ]; then
+echo "2. /var/www/html/dist/"
+if [ -d "/var/www/html/dist" ]; then
     echo "   ⚠️  EXISTS (This might be the problem!)"
-    echo "   Last modified: $(stat -c %y /var/www/html/kizazi-webapp/dist/index.html 2>/dev/null || echo 'No index.html')"
-    echo "   Asset count: $(ls /var/www/html/kizazi-webapp/dist/assets/*.js 2>/dev/null | wc -l) JS files"
+    echo "   Last modified: $(stat -c %y /var/www/html/dist/index.html 2>/dev/null || echo 'No index.html')"
+    echo "   Asset count: $(ls /var/www/html/dist/assets/*.js 2>/dev/null | wc -l) JS files"
 else
     echo "   ✅ NOT FOUND (Good)"
 fi
@@ -44,7 +44,7 @@ fi
 # Check for nested dist folders
 echo ""
 echo "🔍 Checking for nested dist folders:"
-find /var/www/html/kizazi-webapp -name "dist" -type d 2>/dev/null | head -10
+find /var/www/html -name "dist" -type d 2>/dev/null | head -10
 
 # Compare file sizes to detect old vs new
 echo ""
@@ -53,7 +53,7 @@ echo "Source dist/:"
 du -sh dist/* 2>/dev/null | head -5
 echo ""
 echo "Deployed location:"
-du -sh /var/www/html/kizazi-webapp/* 2>/dev/null | grep -v "dist" | head -5
+du -sh /var/www/html/* 2>/dev/null | grep -v "dist" | head -5
 
 # Check actual served content
 echo ""

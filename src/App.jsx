@@ -688,6 +688,7 @@ const Sidebar = ({ isOpen, onClose, activeSection, setActiveSection, isDemoMode 
     { id: 'post-scheduler', label: t('postScheduler'), icon: Calendar },
     { id: 'analytics', label: t('analytics'), icon: BarChart3 },
     { id: 'pricing', label: t('pricing'), icon: DollarSign },
+    { id: 'book-specialist', label: 'Book a specialist', icon: User },
     { id: 'support', label: t('support'), icon: HeadphonesIcon },
   ];
 
@@ -1536,6 +1537,59 @@ const Support = () => {
   );
 };
 
+// Book a Specialist Component
+const BookSpecialist = () => {
+  const specialistTypes = [
+    'SEO specialist',
+    'Content marketing manager',
+    'Social media manager',
+    'Email marketing specialist',
+    'Paid ads specialist (PPC)',
+    'Marketing analytics specialist',
+    'Digital marketing strategist'
+  ];
+
+  return (
+    <div className="p-6 bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 min-h-screen">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            Book a specialist
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Choose the type of marketing specialist you need. Each card below is a placeholder where detailed
+            profiles and booking options will go.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {specialistTypes.map((type) => (
+            <div
+              key={type}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/60 p-6 flex flex-col justify-between"
+            >
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">{type}</h2>
+                <p className="text-gray-600 text-sm">
+                  Placeholder area for {type} details. This is where you&apos;ll show expertise, experience,
+                  availability, and pricing information.
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled
+                className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-200 text-gray-600 text-sm font-medium cursor-not-allowed"
+              >
+                Booking coming soon
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Main App Layout Component
 const AppLayout = ({ isDemoMode, onBackToHome, onShowModeSelection }) => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -1547,6 +1601,7 @@ const AppLayout = ({ isDemoMode, onBackToHome, onShowModeSelection }) => {
       case 'post-scheduler': return <PostScheduler />;
       case 'analytics': return <LegacyAnalytics />;
       case 'pricing': return <RegionalPricing />;
+      case 'book-specialist': return <BookSpecialist />;
       case 'support': return <Support />;
       default: return <Dashboard />;
     }
